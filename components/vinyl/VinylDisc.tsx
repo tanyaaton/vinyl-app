@@ -13,8 +13,8 @@ interface Props {
 }
 
 export default function VinylDisc({ name = '', playlistName = '', size = 512 }: Props) {
-  // The donut hole is ~52% of the disc diameter — label fills it snugly
-  const labelSize = size * 0.52
+  // Label at 0.83 of disc diameter fills the center hole fully
+  const labelSize = size * 0.83
   const labelOffset = (size - labelSize) / 2
 
   // Text positioning within the label (upper half, above the STEREO bar)
