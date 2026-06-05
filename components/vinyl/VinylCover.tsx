@@ -70,10 +70,22 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
         </div>
       ))}
 
-      {/* Name label at bottom-left */}
+      {/* Name label at bottom-left, inside the cover with margin */}
       {name && (
-        <div className="absolute bottom-2 left-3">
-          <span className="font-jacquarda text-gray-700" style={{ fontSize: size * 0.05 }}>
+        <div
+          className="absolute"
+          style={{
+            bottom: size * 0.072 + size * 0.03,  // Cover bottom inset + small margin
+            left: size * 0.087 + size * 0.03,    // Cover left inset + small margin
+          }}
+        >
+          <span
+            className="font-jacquarda text-gray-700"
+            style={{
+              fontSize: size * 0.04,
+              opacity: 0.6
+            }}
+          >
             by {name}
           </span>
         </div>

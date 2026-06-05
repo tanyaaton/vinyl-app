@@ -8,18 +8,21 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header />
       <main
-        className="flex-1 flex flex-col items-center justify-center gap-8 sm:gap-12 px-4"
-        style={{ backgroundColor: '#8B1A1A' }}
+        className="flex-1 flex flex-col items-center justify-center gap-8 sm:gap-12 px-4 relative"
+        style={{ backgroundColor: '#830E0E' }}
       >
-        {/* Subtle wood-grain texture overlay */}
+        {/* Paper effect overlay */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-10"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.02' numOctaves='4' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23grain)'/%3E%3C/svg%3E")`,
+            backgroundImage: 'url(/paper-effect.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
           }}
         />
 
-        <div className="relative">
+        <div className="relative z-10">
           <div className="sm:hidden">
             <VinylDisc size={300} landing />
           </div>
@@ -28,7 +31,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <Link href="/create">
+        <Link href="/create" className="relative z-10">
           <button className="btn-tape text-lg sm:text-2xl px-10 sm:px-16 py-3 sm:py-4">Create a vinyl</button>
         </Link>
       </main>
