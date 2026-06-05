@@ -64,6 +64,7 @@ body {
   clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 97% 100%, 3% 95%, 0% 80%);
   transition: background-color 0.15s, transform 0.1s;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .btn-tape:hover {

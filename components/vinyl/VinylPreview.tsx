@@ -22,11 +22,13 @@ export default function VinylPreview({
   coverSize = 300,
 }: Props) {
   const discSize = coverSize * 1.05
+  const discOverlap = coverSize * 0.45 // How much the disc overlaps the cover
+  const discLeftOffset = (discSize - coverSize) / 2 // Extra space needed on left for larger disc
 
   return (
-    <div className="relative flex items-center" style={{ width: coverSize + discSize * 0.55, height: coverSize }}>
+    <div className="relative flex items-center overflow-visible" style={{ width: coverSize + discSize - discOverlap, height: discSize }}>
       {/* Album sleeve */}
-      <div className="relative z-10" style={{ flexShrink: 0 }}>
+      <div className="relative z-10" style={{ flexShrink: 0, marginTop: (discSize - coverSize) / 2, marginLeft: discLeftOffset }}>
         <VinylCover
           coverImageUrl={coverImageUrl}
           stickers={stickers}
@@ -35,10 +37,10 @@ export default function VinylPreview({
         />
       </div>
 
-      {/* Vinyl disc — overlaps cover from right */}
+      {/* Vinyl disc — overlaps cover from right, brought to front */}
       <div
         className="absolute"
-        style={{ left: coverSize * 0.55, top: (coverSize - discSize) / 2, zIndex: 5 }}
+        style={{ left: coverSize + discLeftOffset - discOverlap, top: 0, zIndex: 20 }}
       >
         <VinylDisc name={name} playlistName={playlistName} size={discSize} />
       </div>

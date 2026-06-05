@@ -13,9 +13,9 @@ export default function CreatePage() {
   const [step, setStep] = useState(1)
 
   return (
-    <div className="flex flex-col min-h-screen paper-texture">
+    <div className="flex flex-col min-h-screen paper-texture overflow-x-hidden">
       <Header />
-      <main className="flex-1 flex flex-col items-center py-4 px-4">
+      <main className="flex-1 flex flex-col items-center py-4 px-4 sm:px-6">
         <StepIndicator current={step} />
 
         <div className="w-full max-w-2xl">

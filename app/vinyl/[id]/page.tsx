@@ -29,26 +29,39 @@ export default async function SharePage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen paper-texture">
       <Header />
-      <main className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-        <h2 className="font-jacquarda text-xl text-gray-600 mb-8 tracking-wider">
-          {vinyl.name}&apos;s vinyl
+      <main className="flex-1 flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+        <h2 className="font-jacquarda text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 tracking-wider">
+          {vinyl.name}'s vinyl
         </h2>
 
-        <VinylPreview
-          name={vinyl.name}
-          playlistName={vinyl.playlistName}
-          coverImageUrl={vinyl.coverImageUrl}
-          stickers={vinyl.stickers}
-          coverSize={320}
-        />
+        <div className="w-full flex justify-center overflow-visible">
+          <div className="sm:hidden">
+            <VinylPreview
+              name={vinyl.name}
+              playlistName={vinyl.playlistName}
+              coverImageUrl={vinyl.coverImageUrl}
+              stickers={vinyl.stickers}
+              coverSize={240}
+            />
+          </div>
+          <div className="hidden sm:block">
+            <VinylPreview
+              name={vinyl.name}
+              playlistName={vinyl.playlistName}
+              coverImageUrl={vinyl.coverImageUrl}
+              stickers={vinyl.stickers}
+              coverSize={320}
+            />
+          </div>
+        </div>
 
-        <p className="font-sheppards text-gray-500 text-2xl mt-10">
+        <p className="font-sheppards text-gray-500 text-xl sm:text-2xl mt-6 sm:mt-10 text-center px-4">
           {vinyl.playlistName} · by {vinyl.name}
         </p>
 
         <a
           href="/"
-          className="btn-tape text-base px-10 py-3 mt-8 inline-block"
+          className="btn-tape text-sm sm:text-base px-8 sm:px-10 py-2 sm:py-3 mt-6 sm:mt-8 inline-block"
         >
           Create yours
         </a>
@@ -56,3 +69,5 @@ export default async function SharePage({ params }: Props) {
     </div>
   )
 }
+
+// Made with Bob

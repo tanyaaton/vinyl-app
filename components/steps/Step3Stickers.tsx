@@ -20,13 +20,20 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
   const placedIds = new Set(stickers.map((s) => s.stickerId))
 
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">Decorate your vinyl case</h2>
+    <div className="flex flex-col items-center w-full px-4">
+      <h2 className="font-jacquarda text-lg sm:text-xl text-gray-700 mb-4 sm:mb-6 tracking-wider">Decorate your vinyl case</h2>
 
-      <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={420} />
+      <div className="w-full flex justify-center">
+        <div className="sm:hidden">
+          <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={280} />
+        </div>
+        <div className="hidden sm:block">
+          <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={420} />
+        </div>
+      </div>
 
       {/* Sticker picker */}
-      <div className="flex gap-6 mt-8 items-end">
+      <div className="flex gap-3 sm:gap-6 mt-6 sm:mt-8 items-end">
         {STICKERS.map(({ id, label }) => {
           const active = placedIds.has(id)
           return (
@@ -37,7 +44,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
               className={`relative p-1 rounded transition-all ${
                 active ? 'ring-2 ring-offset-1 ring-kraft-dark scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'
               }`}
-              style={{ width: 80, height: 80 }}
+              style={{ width: 60, height: 60 }}
             >
               <img
                 src={`/stickers/${id}.png`}
@@ -49,15 +56,15 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
         })}
       </div>
 
-      <p className="font-courier text-xs text-gray-400 mt-3">
+      <p className="font-courier text-xs text-gray-400 mt-3 text-center">
         {stickers.length < 4
           ? `${stickers.length}/4 stickers placed — click to add or remove`
           : 'All corners filled — click a sticker to remove it'}
       </p>
 
-      <div className="flex gap-8 mt-10">
-        <button className="btn-tape text-lg px-10 py-3" onClick={onBack}>Back</button>
-        <button className="btn-tape text-lg px-10 py-3" onClick={onNext}>Next</button>
+      <div className="flex gap-4 sm:gap-8 mt-8 sm:mt-10">
+        <button className="btn-tape text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3" onClick={onBack}>Back</button>
+        <button className="btn-tape text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3" onClick={onNext}>Next</button>
       </div>
     </div>
   )

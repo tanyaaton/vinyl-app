@@ -8,12 +8,13 @@ interface Props {
   playlistName?: string
   size?: number
   landing?: boolean
+  className?: string
 }
 
-export default function VinylDisc({ name = '', playlistName = '', size = 448, landing = false }: Props) {
+export default function VinylDisc({ name = '', playlistName = '', size = 448, landing = false, className = '' }: Props) {
   if (landing) {
     return (
-      <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <div className={`relative shrink-0 ${className}`} style={{ width: size, height: size }}>
         <img
           src="/vinyl-landing.png"
           alt="Vinyl record"
@@ -35,7 +36,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
   const playlistY = labelOffset + labelSize * 0.4
 
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
+    <div className={`relative shrink-0 ${className}`} style={{ width: size, height: size }}>
       <img
         src="/vinyl-base.png"
         alt="Vinyl record"

@@ -59,22 +59,35 @@ export default function Step4Final() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">
+    <div className="flex flex-col items-center w-full px-4">
+      <h2 className="font-jacquarda text-lg sm:text-xl text-gray-700 mb-4 sm:mb-6 tracking-wider">
         {"Here's your vinyl"}
       </h2>
 
       {/* Vinyl preview — always visible */}
-      <VinylPreview
-        name={store.name}
-        playlistName={store.playlistName}
-        coverImageUrl={store.coverImagePreviewUrl}
-        stickers={store.stickers}
-        coverSize={380}
-      />
+      <div className="w-full flex justify-center overflow-visible">
+        <div className="sm:hidden">
+          <VinylPreview
+            name={store.name}
+            playlistName={store.playlistName}
+            coverImageUrl={store.coverImagePreviewUrl}
+            stickers={store.stickers}
+            coverSize={240}
+          />
+        </div>
+        <div className="hidden sm:block">
+          <VinylPreview
+            name={store.name}
+            playlistName={store.playlistName}
+            coverImageUrl={store.coverImagePreviewUrl}
+            stickers={store.stickers}
+            coverSize={380}
+          />
+        </div>
+      </div>
 
       {/* Save status row */}
-      <div className="mt-10 flex flex-col items-center gap-3 w-full max-w-lg">
+      <div className="mt-6 sm:mt-10 flex flex-col items-center gap-3 w-full max-w-lg">
         {saveState === 'saving' && (
           <p className="font-jacquarda text-sm text-gray-400 animate-pulse">
             saving your vinyl…
@@ -89,12 +102,12 @@ export default function Step4Final() {
         )}
 
         {saveState === 'done' && shareUrl && (
-          <div className="flex items-center gap-3 w-full">
-            <span className="font-jacquarda text-xl text-gray-600 whitespace-nowrap">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
+            <span className="font-jacquarda text-base sm:text-xl text-gray-600 sm:whitespace-nowrap">
               Share this vinyl
             </span>
-            <input readOnly value={shareUrl} className="vinyl-input flex-1 text-sm" />
-            <button className="btn-tape px-5 py-2 text-base" onClick={handleCopy}>
+            <input readOnly value={shareUrl} className="vinyl-input flex-1 text-xs sm:text-sm" />
+            <button className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base" onClick={handleCopy}>
               {copied ? 'copied!' : 'copy'}
             </button>
           </div>

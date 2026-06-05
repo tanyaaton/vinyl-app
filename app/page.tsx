@@ -5,10 +5,10 @@ import VinylDisc from '@/components/vinyl/VinylDisc'
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header />
       <main
-        className="flex-1 flex flex-col items-center justify-center gap-12"
+        className="flex-1 flex flex-col items-center justify-center gap-8 sm:gap-12 px-4"
         style={{ backgroundColor: '#8B1A1A' }}
       >
         {/* Subtle wood-grain texture overlay */}
@@ -20,11 +20,16 @@ export default function LandingPage() {
         />
 
         <div className="relative">
-          <VinylDisc size={520} landing />
+          <div className="sm:hidden">
+            <VinylDisc size={300} landing />
+          </div>
+          <div className="hidden sm:block">
+            <VinylDisc size={520} landing />
+          </div>
         </div>
 
         <Link href="/create">
-          <button className="btn-tape text-2xl px-16 py-4">Create a vinyl</button>
+          <button className="btn-tape text-lg sm:text-2xl px-10 sm:px-16 py-3 sm:py-4">Create a vinyl</button>
         </Link>
       </main>
     </div>
