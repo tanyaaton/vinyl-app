@@ -42,6 +42,7 @@ export default async function SharePage({ params }: Props) {
               coverImageUrl={vinyl.coverImageUrl}
               stickers={vinyl.stickers}
               coverSize={240}
+              interactive={true}
             />
           </div>
           <div className="hidden sm:block">
@@ -51,6 +52,7 @@ export default async function SharePage({ params }: Props) {
               coverImageUrl={vinyl.coverImageUrl}
               stickers={vinyl.stickers}
               coverSize={320}
+              interactive={true}
             />
           </div>
         </div>

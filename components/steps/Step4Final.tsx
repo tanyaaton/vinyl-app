@@ -73,6 +73,7 @@ export default function Step4Final() {
             coverImageUrl={store.coverImagePreviewUrl}
             stickers={store.stickers}
             coverSize={240}
+            interactive={true}
           />
         </div>
         <div className="hidden sm:block">
@@ -82,6 +83,7 @@ export default function Step4Final() {
             coverImageUrl={store.coverImagePreviewUrl}
             stickers={store.stickers}
             coverSize={380}
+            interactive={true}
           />
         </div>
       </div>
