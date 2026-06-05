@@ -12,6 +12,10 @@ const STICKER_IMAGES: Record<string, string> = {
   stamp: '/stickers/stamp.png',
   psilove: '/stickers/psilove.png',
   bow: '/stickers/bow.png',
+  lips: '/stickers/lips.png',
+  moon: '/stickers/moon.png',
+  bluestamp: '/stickers/bluestamp.png',
+  tulips: '/stickers/tulips.png',
 }
 
 const CORNER_STYLES: Record<string, React.CSSProperties> = {

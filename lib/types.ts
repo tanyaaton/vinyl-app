@@ -1,6 +1,6 @@
 export type StickerCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
-export type StickerId = 'stars' | 'stamp' | 'psilove' | 'bow'
+export type StickerId = 'stars' | 'stamp' | 'psilove' | 'bow' | 'lips' | 'moon' | 'bluestamp' | 'tulips'
 
 export interface StickerPlacement {
   stickerId: StickerId

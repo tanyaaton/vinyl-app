@@ -13,6 +13,10 @@ const STICKERS: { id: StickerId; label: string }[] = [
   { id: 'stamp', label: 'Stamp' },
   { id: 'psilove', label: 'P.S.' },
   { id: 'bow', label: 'Bow' },
+  { id: 'lips', label: 'Lips' },
+  { id: 'moon', label: 'Moon' },
+  { id: 'bluestamp', label: 'Blue Stamp' },
+  { id: 'tulips', label: 'Tulips' },
 ]
 
 export default function Step3Stickers({ onBack, onNext }: Props) {
@@ -33,7 +37,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
       </div>
 
       {/* Sticker picker */}
-      <div className="flex gap-3 sm:gap-6 mt-6 sm:mt-8 items-end">
+      <div className="grid grid-cols-4 gap-3 sm:gap-6 mt-6 sm:mt-8 max-w-xs sm:max-w-md">
         {STICKERS.map(({ id, label }) => {
           const active = placedIds.has(id)
           return (
