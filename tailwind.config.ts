@@ -12,14 +12,17 @@ const config: Config = {
         'crimson-dark': '#6B1010',
         'vinyl-yellow': '#F5C518',
         'vinyl-label-text': '#7B1818',
-        'paper-bg': '#E8E3DC',
+        'paper-bg': '#EDE9E3',
         kraft: '#C4A882',
         'kraft-dark': '#A8906A',
       },
       fontFamily: {
-        pixel: ['"Press Start 2P"', 'monospace'],
-        gothic: ['"UnifrakturMaguntia"', 'cursive'],
-        script: ['"Dancing Script"', 'cursive'],
+        // Jacquarda: general UI, buttons, labels, name on vinyl
+        jacquarda: ['"Jacquarda"', 'cursive'],
+        // Mrs Sheppards: playlist name (big script on vinyl label)
+        sheppards: ['"MrsSheppards"', 'cursive'],
+        // Courier Prime: user input fields
+        courier: ['"CourierPrime"', '"Courier New"', 'monospace'],
       },
     },
   },

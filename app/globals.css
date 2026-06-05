@@ -1,4 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=UnifrakturMaguntia&family=Dancing+Script:wght@400;600;700&display=swap');
+@font-face {
+  font-family: 'CourierPrime';
+  src: url('/fonts/CourierPrime-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jacquarda';
+  src: url('/fonts/JacquardaBastarda9-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MrsSheppards';
+  src: url('/fonts/MrsSheppards-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -21,7 +43,6 @@ body {
   padding: 0;
 }
 
-/* Crumpled paper texture via CSS — swap for real texture PNG when available */
 .paper-texture {
   background-color: var(--paper-bg);
   background-image:
@@ -29,19 +50,17 @@ body {
   background-repeat: repeat;
 }
 
-/* Tape-style button base */
 .btn-tape {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background-color: var(--kraft);
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 1.1rem;
+  font-family: 'Jacquarda', cursive;
+  font-size: 1.4rem;
   color: #2a2a2a;
   padding: 0.5rem 1.8rem;
   border: none;
   cursor: pointer;
-  position: relative;
   clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 97% 100%, 3% 95%, 0% 80%);
   transition: background-color 0.15s, transform 0.1s;
   letter-spacing: 0.02em;
@@ -56,13 +75,12 @@ body {
   transform: translateY(0px);
 }
 
-/* Input field style matching Figma */
 .vinyl-input {
   background-color: #e0dbd4;
   border: none;
   outline: none;
   padding: 0.5rem 0.75rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'CourierPrime', 'Courier New', monospace;
   font-size: 0.95rem;
   color: #333;
   width: 100%;

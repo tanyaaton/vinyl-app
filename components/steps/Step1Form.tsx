@@ -12,13 +12,13 @@ export default function Step1Form({ onBack, onNext }: Props) {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="font-pixel text-xs text-gray-700 mb-6 tracking-wider">Your vinyl detail</h2>
+      <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">Your vinyl detail</h2>
 
       <VinylDisc name={name} playlistName={playlistName} size={280} />
 
       <div className="mt-8 flex flex-col gap-4 w-full max-w-sm">
         <div className="flex items-center gap-4">
-          <label className="font-pixel text-[10px] text-gray-600 whitespace-nowrap w-32 text-right shrink-0">
+          <label className="font-jacquarda text-base text-gray-600 whitespace-nowrap w-36 text-right shrink-0">
             your name :
           </label>
           <input
@@ -30,7 +30,7 @@ export default function Step1Form({ onBack, onNext }: Props) {
           />
         </div>
         <div className="flex items-center gap-4">
-          <label className="font-pixel text-[10px] text-gray-600 whitespace-nowrap w-32 text-right shrink-0">
+          <label className="font-jacquarda text-base text-gray-600 whitespace-nowrap w-36 text-right shrink-0">
             playlist name :
           </label>
           <input

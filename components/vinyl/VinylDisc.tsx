@@ -58,32 +58,32 @@ export default function VinylDisc({ name = '', playlistName = '', size = 320 }: 
             <path id="topArc" d="M 15,50 A 35,35 0 0,1 85,50" />
             <path id="bottomArc" d="M 18,62 A 32,32 0 0,0 82,62" />
           </defs>
-          <text fill="#7B1818" fontSize="6" fontFamily="'Courier New', monospace">
+          <text fill="#7B1818" fontSize="6" fontFamily="'Jacquarda', cursive">
             <textPath href="#topArc" startOffset="50%" textAnchor="middle">
               share your music with vinyl
             </textPath>
           </text>
-          <text fill="#7B1818" fontSize="5.5" fontFamily="'Courier New', monospace">
+          <text fill="#7B1818" fontSize="5.5" fontFamily="'Jacquarda', cursive">
             <textPath href="#bottomArc" startOffset="50%" textAnchor="middle">
               created with love by @tanyaaton
             </textPath>
           </text>
         </svg>
 
-        {/* Name ("by …") */}
+        {/* Name ("by …") — Jacquarda */}
         {name && (
           <p
-            className="font-script text-vinyl-label-text text-center leading-none mb-0.5 relative z-10"
-            style={{ fontSize: labelSize * 0.1 }}
+            className="font-jacquarda text-vinyl-label-text text-center leading-none mb-0.5 relative z-10"
+            style={{ fontSize: labelSize * 0.09 }}
           >
             by {name}
           </p>
         )}
 
-        {/* Playlist name — big script */}
+        {/* Playlist name — Mrs Sheppards big script */}
         <p
-          className="font-script font-bold text-vinyl-label-text text-center leading-none relative z-10"
-          style={{ fontSize: playlistName ? labelSize * 0.18 : labelSize * 0.22 }}
+          className="font-sheppards text-vinyl-label-text text-center leading-none relative z-10"
+          style={{ fontSize: playlistName ? labelSize * 0.2 : labelSize * 0.22 }}
         >
           {playlistName || 'Vinyl'}
         </p>
@@ -93,24 +93,24 @@ export default function VinylDisc({ name = '', playlistName = '', size = 320 }: 
           className="flex items-center gap-1 relative z-10 mt-1"
           style={{ fontSize: labelSize * 0.07 }}
         >
-          <span className="font-mono text-vinyl-label-text tracking-widest uppercase">STEREO</span>
+          <span className="font-jacquarda text-vinyl-label-text tracking-widest uppercase">STEREO</span>
           <div
             className="rounded-full bg-vinyl-label-text"
             style={{ width: labelSize * 0.07, height: labelSize * 0.07 }}
           />
-          <span className="font-mono text-vinyl-label-text tracking-widest uppercase">45 RPM</span>
+          <span className="font-jacquarda text-vinyl-label-text tracking-widest uppercase">45 RPM</span>
         </div>
 
         {/* MUSIC RECORD / SIDE A */}
         <div className="text-center relative z-10 mt-0.5">
           <p
-            className="font-mono text-vinyl-label-text tracking-widest uppercase font-bold leading-none"
+            className="font-jacquarda text-vinyl-label-text tracking-widest uppercase font-bold leading-none"
             style={{ fontSize: labelSize * 0.075 }}
           >
             MUSIC RECORD
           </p>
           <p
-            className="font-mono text-vinyl-label-text tracking-widest uppercase leading-none"
+            className="font-jacquarda text-vinyl-label-text tracking-widest uppercase leading-none"
             style={{ fontSize: labelSize * 0.065 }}
           >
             SIDE A

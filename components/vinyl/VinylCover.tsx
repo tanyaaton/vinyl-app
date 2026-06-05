@@ -71,7 +71,7 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
       {name && (
         <div className="absolute bottom-2 left-3">
           <span
-            className="font-script text-gray-700"
+            className="font-jacquarda text-gray-700"
             style={{ fontSize: size * 0.055 }}
           >
             by {name}

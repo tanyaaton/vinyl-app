@@ -54,10 +54,10 @@ export default function Step4Final() {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="font-pixel text-xs text-gray-700 mb-6 tracking-wider">{"Here's your vinyl"}</h2>
+      <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">{"Here's your vinyl"}</h2>
 
       {saving ? (
-        <div className="font-pixel text-[10px] text-gray-500 my-16">Saving your vinyl…</div>
+        <div className="font-jacquarda text-lg text-gray-500 my-16">Saving your vinyl…</div>
       ) : (
         <>
           <VinylPreview
@@ -69,12 +69,12 @@ export default function Step4Final() {
           />
 
           {error && (
-            <p className="font-pixel text-[9px] text-red-600 mt-4 max-w-sm text-center">{error}</p>
+            <p className="font-courier text-xs text-red-600 mt-4 max-w-sm text-center">{error}</p>
           )}
 
           {shareUrl && (
             <div className="flex items-center gap-3 mt-10">
-              <span className="font-script text-gray-600 text-lg whitespace-nowrap">Share this vinyl</span>
+              <span className="font-jacquarda text-xl text-gray-600 whitespace-nowrap">Share this vinyl</span>
               <input
                 readOnly
                 value={shareUrl}
@@ -87,7 +87,7 @@ export default function Step4Final() {
           )}
 
           <button
-            className="font-pixel text-[9px] text-gray-400 hover:text-gray-700 mt-8 transition-colors"
+            className="font-jacquarda text-base text-gray-400 hover:text-gray-700 mt-8 transition-colors"
             onClick={handleStartOver}
           >
             ↩ start over

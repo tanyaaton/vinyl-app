@@ -21,7 +21,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="font-pixel text-xs text-gray-700 mb-6 tracking-wider">Decorate your vinyl case</h2>
+      <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">Decorate your vinyl case</h2>
 
       <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={320} />
 
@@ -49,7 +49,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
         })}
       </div>
 
-      <p className="font-pixel text-[9px] text-gray-400 mt-3">
+      <p className="font-courier text-xs text-gray-400 mt-3">
         {stickers.length < 4
           ? `${stickers.length}/4 stickers placed — click to add or remove`
           : 'All corners filled — click a sticker to remove it'}

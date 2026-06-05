@@ -30,7 +30,7 @@ export default async function SharePage({ params }: Props) {
     <div className="flex flex-col min-h-screen paper-texture">
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-        <h2 className="font-pixel text-xs text-gray-600 mb-8 tracking-wider">
+        <h2 className="font-jacquarda text-xl text-gray-600 mb-8 tracking-wider">
           {vinyl.name}&apos;s vinyl
         </h2>
 
@@ -42,7 +42,7 @@ export default async function SharePage({ params }: Props) {
           coverSize={320}
         />
 
-        <p className="font-script text-gray-500 text-lg mt-10">
+        <p className="font-sheppards text-gray-500 text-2xl mt-10">
           {vinyl.playlistName} · by {vinyl.name}
         </p>
 
