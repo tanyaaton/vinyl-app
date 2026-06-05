@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import type { StickerPlacement } from '@/lib/types'
 
 interface Props {
@@ -8,18 +7,17 @@ interface Props {
   size?: number
 }
 
-// Swap .svg → .png once real assets are exported from Figma
 const STICKER_IMAGES: Record<string, string> = {
-  stars: '/stickers/stars.svg',
-  stamp: '/stickers/stamp.svg',
-  psilove: '/stickers/psilove.svg',
-  bow: '/stickers/bow.svg',
+  stars: '/stickers/stars.png',
+  stamp: '/stickers/stamp.png',
+  psilove: '/stickers/psilove.png',
+  bow: '/stickers/bow.png',
 }
 
 const CORNER_STYLES: Record<string, React.CSSProperties> = {
-  'top-left': { top: 8, left: 8 },
-  'top-right': { top: 8, right: 8 },
-  'bottom-left': { bottom: 8, left: 8 },
+  'top-left':     { top: 8, left: 8 },
+  'top-right':    { top: 8, right: 8 },
+  'bottom-left':  { bottom: 8, left: 8 },
   'bottom-right': { bottom: 8, right: 8 },
 }
 
@@ -27,14 +25,17 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
   return (
     <div
       className="relative shrink-0 overflow-hidden"
-      style={{
-        width: size,
-        height: size,
-        background: 'linear-gradient(145deg, #e8e4df 0%, #d4cfc9 100%)',
-        boxShadow: '2px 2px 12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.4)',
-      }}
+      style={{ width: size, height: size }}
     >
-      {/* Cover image at 35% opacity */}
+      {/* Layer 0: real sleeve base PNG */}
+      <img
+        src="/vinyl-cover-base.png"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
+
+      {/* Layer 1: user cover image at 65% opacity */}
       {coverImageUrl && (
         <img
           src={coverImageUrl}
@@ -44,20 +45,12 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
         />
       )}
 
-      {/* Sleeve highlight */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
-        }}
-      />
-
       {/* Stickers */}
       {stickers.map(({ stickerId, corner }) => (
         <div
           key={stickerId}
           className="absolute"
-          style={{ ...CORNER_STYLES[corner], width: size * 0.22, height: size * 0.22 }}
+          style={{ ...CORNER_STYLES[corner], width: size * 0.25, height: size * 0.25 }}
         >
           <img
             src={STICKER_IMAGES[stickerId]}
@@ -70,10 +63,7 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
       {/* Name label at bottom-left */}
       {name && (
         <div className="absolute bottom-2 left-3">
-          <span
-            className="font-jacquarda text-gray-700"
-            style={{ fontSize: size * 0.055 }}
-          >
+          <span className="font-jacquarda text-gray-700" style={{ fontSize: size * 0.055 }}>
             by {name}
           </span>
         </div>

@@ -40,7 +40,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
               style={{ width: 80, height: 80 }}
             >
               <img
-                src={`/stickers/${id}.svg`}
+                src={`/stickers/${id}.png`}
                 alt={label}
                 className="w-full h-full object-contain"
               />

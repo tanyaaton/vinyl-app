@@ -1,6 +1,10 @@
 /**
- * CSS-rendered vinyl disc. Replace outer div background with vinyl-disc.png
- * once exported from Figma — keep the label overlay as-is.
+ * Vinyl disc composite:
+ *   Layer 0 – vinyl-grooves.png  (full black disc, white center hole)
+ *   Layer 1 – vinyl-label.png    (yellow label with STEREO / MUSIC RECORD baked in)
+ *   Layer 2 – dynamic text       (user's name + playlist name, upper half of label)
+ *
+ * To swap assets: replace files in /public/ — no code change needed.
  */
 interface Props {
   name?: string
@@ -9,125 +13,73 @@ interface Props {
 }
 
 export default function VinylDisc({ name = '', playlistName = '', size = 320 }: Props) {
-  const s = size
-  const labelSize = s * 0.45
-  const labelOffset = (s - labelSize) / 2
+  // The label sits in the centre and covers ~46% of the disc diameter
+  const labelSize = size * 0.46
+  const labelOffset = (size - labelSize) / 2
+
+  // Text positioning within the label (upper half, above the STEREO bar)
+  const labelCentreX = size / 2
+  // "by name" sits about 28% from top of the label area
+  const nameY = labelOffset + labelSize * 0.28
+  // Playlist name sits about 40% from top of label area
+  const playlistY = labelOffset + labelSize * 0.42
 
   return (
-    <div
-      className="relative rounded-full shrink-0"
-      style={{
-        width: s,
-        height: s,
-        background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 60%, #111 75%, #0a0a0a 100%)',
-        boxShadow: `0 ${s * 0.03}px ${s * 0.1}px rgba(0,0,0,0.6), inset 0 0 ${s * 0.05}px rgba(255,255,255,0.04)`,
-      }}
-    >
-      {/* Groove rings */}
-      {[0.25, 0.33, 0.41, 0.48, 0.55, 0.62, 0.7, 0.77, 0.84, 0.9, 0.95].map((r) => (
-        <div
-          key={r}
-          className="absolute rounded-full border border-gray-700/30"
-          style={{
-            width: s * r,
-            height: s * r,
-            top: (s - s * r) / 2,
-            left: (s - s * r) / 2,
-          }}
-        />
-      ))}
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      {/* Layer 0: groove ring */}
+      <img
+        src="/vinyl-grooves.png"
+        alt=""
+        className="absolute inset-0 w-full h-full"
+        draggable={false}
+      />
 
-      {/* Yellow label */}
-      <div
-        className="absolute rounded-full overflow-hidden flex flex-col items-center justify-center"
+      {/* Layer 1: yellow label centered */}
+      <img
+        src="/vinyl-label.png"
+        alt=""
+        className="absolute"
         style={{
           width: labelSize,
           height: labelSize,
           top: labelOffset,
           left: labelOffset,
-          backgroundColor: '#F5C518',
         }}
-      >
-        {/* Curved top text */}
-        <svg
-          className="absolute top-0 left-0 w-full h-full"
-          viewBox="0 0 100 100"
-          style={{ overflow: 'visible' }}
-        >
-          <defs>
-            <path id="topArc" d="M 15,50 A 35,35 0 0,1 85,50" />
-            <path id="bottomArc" d="M 18,62 A 32,32 0 0,0 82,62" />
-          </defs>
-          <text fill="#7B1818" fontSize="6" fontFamily="'Jacquarda', cursive">
-            <textPath href="#topArc" startOffset="50%" textAnchor="middle">
-              share your music with vinyl
-            </textPath>
-          </text>
-          <text fill="#7B1818" fontSize="5.5" fontFamily="'Jacquarda', cursive">
-            <textPath href="#bottomArc" startOffset="50%" textAnchor="middle">
-              created with love by @tanyaaton
-            </textPath>
-          </text>
-        </svg>
+        draggable={false}
+      />
 
-        {/* Name ("by …") — Jacquarda */}
+      {/* Layer 2: dynamic text overlay */}
+      <svg
+        className="absolute inset-0"
+        width={size}
+        height={size}
+        style={{ overflow: 'visible' }}
+      >
         {name && (
-          <p
-            className="font-jacquarda text-vinyl-label-text text-center leading-none mb-0.5 relative z-10"
-            style={{ fontSize: labelSize * 0.09 }}
+          <text
+            x={labelCentreX}
+            y={nameY}
+            textAnchor="middle"
+            fontFamily="'Jacquarda', cursive"
+            fontSize={labelSize * 0.1}
+            fill="#7B1818"
           >
             by {name}
-          </p>
+          </text>
         )}
-
-        {/* Playlist name — Mrs Sheppards big script */}
-        <p
-          className="font-sheppards text-vinyl-label-text text-center leading-none relative z-10"
-          style={{ fontSize: playlistName ? labelSize * 0.2 : labelSize * 0.22 }}
-        >
-          {playlistName || 'Vinyl'}
-        </p>
-
-        {/* STEREO / 45 RPM bar */}
-        <div
-          className="flex items-center gap-1 relative z-10 mt-1"
-          style={{ fontSize: labelSize * 0.07 }}
-        >
-          <span className="font-jacquarda text-vinyl-label-text tracking-widest uppercase">STEREO</span>
-          <div
-            className="rounded-full bg-vinyl-label-text"
-            style={{ width: labelSize * 0.07, height: labelSize * 0.07 }}
-          />
-          <span className="font-jacquarda text-vinyl-label-text tracking-widest uppercase">45 RPM</span>
-        </div>
-
-        {/* MUSIC RECORD / SIDE A */}
-        <div className="text-center relative z-10 mt-0.5">
-          <p
-            className="font-jacquarda text-vinyl-label-text tracking-widest uppercase font-bold leading-none"
-            style={{ fontSize: labelSize * 0.075 }}
+        {playlistName && (
+          <text
+            x={labelCentreX}
+            y={playlistY}
+            textAnchor="middle"
+            fontFamily="'MrsSheppards', cursive"
+            fontSize={labelSize * 0.2}
+            fill="#7B1818"
           >
-            MUSIC RECORD
-          </p>
-          <p
-            className="font-jacquarda text-vinyl-label-text tracking-widest uppercase leading-none"
-            style={{ fontSize: labelSize * 0.065 }}
-          >
-            SIDE A
-          </p>
-        </div>
-      </div>
-
-      {/* Center hole */}
-      <div
-        className="absolute rounded-full bg-gray-900"
-        style={{
-          width: s * 0.04,
-          height: s * 0.04,
-          top: s * 0.48,
-          left: s * 0.48,
-        }}
-      />
+            {playlistName}
+          </text>
+        )}
+      </svg>
     </div>
   )
 }
