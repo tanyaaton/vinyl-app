@@ -12,15 +12,15 @@ interface Props {
   size?: number
 }
 
-export default function VinylDisc({ name = '', playlistName = '', size = 320 }: Props) {
-  // The label sits in the centre and covers ~46% of the disc diameter
-  const labelSize = size * 0.46
+export default function VinylDisc({ name = '', playlistName = '', size = 512 }: Props) {
+  // The donut hole is ~52% of the disc diameter — label fills it snugly
+  const labelSize = size * 0.52
   const labelOffset = (size - labelSize) / 2
 
   // Text positioning within the label (upper half, above the STEREO bar)
   const labelCentreX = size / 2
-  // "by name" sits about 28% from top of the label area
-  const nameY = labelOffset + labelSize * 0.28
+  // "by name" sits about 26% from top of the label area
+  const nameY = labelOffset + labelSize * 0.26
   // Playlist name sits about 40% from top of label area
   const playlistY = labelOffset + labelSize * 0.42
 
