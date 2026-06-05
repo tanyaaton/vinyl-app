@@ -28,7 +28,7 @@ const CORNER_STYLES: Record<string, React.CSSProperties> = {
 export default function VinylCover({ coverImageUrl, stickers = [], name = '', size = 320 }: Props) {
   return (
     <div
-      className="relative shrink-0 overflow-hidden"
+      className="relative shrink-0 overflow-hidden shadow-md"
       style={{ width: size, height: size }}
     >
       {/* Layer 0: real sleeve base PNG */}
@@ -80,8 +80,8 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
             className="absolute"
             style={{
               ...positionStyle,
-              width: size * 0.25,
-              height: size * 0.25
+              width: size * 0.25 * 1.2,
+              height: size * 0.25 * 1.2
             }}
           >
             <img
