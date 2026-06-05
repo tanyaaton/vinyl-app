@@ -57,21 +57,23 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--kraft);
+  background-image: url('/tape.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   font-family: 'Jacquarda', cursive;
   font-size: 1.4rem;
   color: #2a2a2a;
   padding: 0.5rem 1.8rem;
   border: none;
   cursor: pointer;
-  clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 97% 100%, 3% 95%, 0% 80%);
-  transition: background-color 0.15s, transform 0.1s;
+  transition: transform 0.1s, filter 0.15s;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
 .btn-tape:hover {
-  background-color: #b8966a;
+  filter: brightness(0.95);
   transform: translateY(-1px);
 }
 
