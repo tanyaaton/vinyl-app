@@ -8,6 +8,7 @@ export async function saveVinyl(params: {
   playlistName: string
   coverImageFile: File | null
   stickers: StickerPlacement[]
+  tracks: string[]
 }): Promise<string> {
   const id = crypto.randomUUID()
 
@@ -24,6 +25,7 @@ export async function saveVinyl(params: {
     playlistName: params.playlistName,
     coverImageUrl,
     stickers: params.stickers,
+    tracks: params.tracks,
     createdAt: new Date().toISOString(),
   }
 

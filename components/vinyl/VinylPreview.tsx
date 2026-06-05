@@ -13,6 +13,7 @@ interface Props {
   playlistName: string
   coverImageUrl?: string | null
   stickers?: StickerPlacement[]
+  tracks?: string[]
   coverSize?: number
   interactive?: boolean
 }
@@ -22,6 +23,7 @@ export default function VinylPreview({
   playlistName,
   coverImageUrl,
   stickers = [],
+  tracks = [],
   coverSize = 300,
   interactive = false,
 }: Props) {
@@ -47,6 +49,7 @@ export default function VinylPreview({
           coverImageUrl={coverImageUrl}
           stickers={stickers}
           name={name}
+          tracks={tracks}
           size={coverSize}
         />
       </div>

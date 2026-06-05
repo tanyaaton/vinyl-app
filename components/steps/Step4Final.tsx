@@ -31,6 +31,7 @@ export default function Step4Final() {
             playlistName: store.playlistName,
             coverImageFile: store.coverImageFile,
             stickers: store.stickers,
+            tracks: store.tracks,
           }),
           timeout,
         ])
@@ -72,6 +73,7 @@ export default function Step4Final() {
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
             stickers={store.stickers}
+            tracks={store.tracks}
             coverSize={240}
             interactive={true}
           />
@@ -82,6 +84,7 @@ export default function Step4Final() {
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
             stickers={store.stickers}
+            tracks={store.tracks}
             coverSize={380}
             interactive={true}
           />

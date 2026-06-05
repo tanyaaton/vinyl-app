@@ -11,6 +11,7 @@ interface VinylStore {
   coverImageFile: File | null
   coverImagePreviewUrl: string | null
   stickers: StickerPlacement[]
+  tracks: string[]
   vinylId: string | null
 
   setName: (name: string) => void
@@ -27,7 +28,18 @@ const initialState = {
   coverImageFile: null,
   coverImagePreviewUrl: null,
   stickers: [] as StickerPlacement[],
+  tracks: ['song1', 'song2', 'song3', 'song4', 'song5', 'song6', 'song7', 'song8', 'song9', 'song10', 'song11', 'song12'],
   vinylId: null,
+}
+
+// Ensure tracks array always has 12 items
+const ensureTracksLength = (tracks: string[]): string[] => {
+  if (tracks.length >= 12) return tracks.slice(0, 12)
+  const result = [...tracks]
+  while (result.length < 12) {
+    result.push(`song${result.length + 1}`)
+  }
+  return result
 }
 
 export const useVinylStore = create<VinylStore>()(
@@ -79,7 +91,13 @@ export const useVinylStore = create<VinylStore>()(
         getItem: (key) => {
           if (typeof window === 'undefined') return null
           const item = sessionStorage.getItem(key)
-          return item ? JSON.parse(item) : null
+          if (!item) return null
+          const parsed = JSON.parse(item)
+          // Ensure tracks always has 12 items when loading from storage
+          if (parsed.state?.tracks) {
+            parsed.state.tracks = ensureTracksLength(parsed.state.tracks)
+          }
+          return parsed
         },
         setItem: (key, value) => {
           if (typeof window !== 'undefined')
@@ -95,6 +113,7 @@ export const useVinylStore = create<VinylStore>()(
           name: state.name,
           playlistName: state.playlistName,
           stickers: state.stickers,
+          tracks: ensureTracksLength(state.tracks),
           vinylId: state.vinylId,
         }) as unknown as VinylStore,
     }

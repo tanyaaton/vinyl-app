@@ -17,6 +17,7 @@ export interface VinylData {
   playlistName: string
   coverImageUrl: string | null
   stickers: StickerPlacement[]
+  tracks: string[]
   createdAt: string
   // v2: themeColor?: string; fontFamily?: string; spotifyPlaylistId?: string
 }
