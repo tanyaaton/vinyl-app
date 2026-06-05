@@ -13,17 +13,23 @@ interface Props {
 }
 
 export default function VinylDisc({ name = '', playlistName = '', size = 448 }: Props) {
-  // Label at 0.68 — fills the donut hole while staying inside the groove ring
-  const labelSize = size * 0.68
-  const labelOffset = (size - labelSize) / 2
+  // Label at 1.05 — slightly overlaps the inner groove ring edge
+  const labelSize = size * 1
+  const labelOffset = (size - labelSize) / 2 
 
   const labelCentreX = size / 2
-  const nameY = labelOffset + labelSize * 0.26
-  const playlistY = labelOffset + labelSize * 0.42
+  const nameY = labelOffset + labelSize * 0.35
+  const playlistY = labelOffset + labelSize * 0.45
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       {/* Layer 0: groove ring */}
+      {/* Dark base fills the white gaps in the groove ring PNG center */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{ backgroundColor: '#111111' }}
+      />
+
       <img
         src="/vinyl-grooves.png"
         alt=""
@@ -58,7 +64,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448 }: 
             y={nameY}
             textAnchor="middle"
             fontFamily="'Jacquarda', cursive"
-            fontSize={labelSize * 0.07}
+            fontSize={labelSize * 0.03}
             fill="#7B1818"
           >
             by {name}
@@ -70,7 +76,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448 }: 
             y={playlistY}
             textAnchor="middle"
             fontFamily="'MrsSheppards', cursive"
-            fontSize={labelSize * 0.2}
+            fontSize={labelSize * 0.12}
             fill="#7B1818"
           >
             {playlistName}
