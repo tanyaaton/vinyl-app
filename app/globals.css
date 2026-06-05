@@ -1,27 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=UnifrakturMaguntia&family=Dancing+Script:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --crimson: #8B1A1A;
+  --vinyl-yellow: #F5C518;
+  --vinyl-label-text: #7B1818;
+  --paper-bg: #EDE9E3;
+  --kraft: #C4A882;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Crumpled paper texture via CSS — swap for real texture PNG when available */
+.paper-texture {
+  background-color: var(--paper-bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Tape-style button base */
+.btn-tape {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--kraft);
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.1rem;
+  color: #2a2a2a;
+  padding: 0.5rem 1.8rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 97% 100%, 3% 95%, 0% 80%);
+  transition: background-color 0.15s, transform 0.1s;
+  letter-spacing: 0.02em;
+}
+
+.btn-tape:hover {
+  background-color: #b8966a;
+  transform: translateY(-1px);
+}
+
+.btn-tape:active {
+  transform: translateY(0px);
+}
+
+/* Input field style matching Figma */
+.vinyl-input {
+  background-color: #e0dbd4;
+  border: none;
+  outline: none;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: #333;
+  width: 100%;
+}
+
+.vinyl-input:focus {
+  background-color: #d8d3cc;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
 }

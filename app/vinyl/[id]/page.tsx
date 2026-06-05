@@ -1,0 +1,58 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { getVinyl } from '@/lib/vinylService'
+import Header from '@/components/ui/Header'
+import VinylPreview from '@/components/vinyl/VinylPreview'
+
+interface Props {
+  params: { id: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const vinyl = await getVinyl(params.id)
+  if (!vinyl) return { title: 'Vinyl not found' }
+  return {
+    title: `${vinyl.playlistName} by ${vinyl.name} — get your vinyl`,
+    description: `${vinyl.name} created a vinyl for their playlist "${vinyl.playlistName}". Create yours!`,
+    openGraph: {
+      title: `${vinyl.playlistName} by ${vinyl.name}`,
+      description: 'Create your own personalised vinyl record',
+      images: vinyl.coverImageUrl ? [vinyl.coverImageUrl] : [],
+    },
+  }
+}
+
+export default async function SharePage({ params }: Props) {
+  const vinyl = await getVinyl(params.id)
+  if (!vinyl) notFound()
+
+  return (
+    <div className="flex flex-col min-h-screen paper-texture">
+      <Header />
+      <main className="flex-1 flex flex-col items-center justify-center py-12 px-4">
+        <h2 className="font-pixel text-xs text-gray-600 mb-8 tracking-wider">
+          {vinyl.name}&apos;s vinyl
+        </h2>
+
+        <VinylPreview
+          name={vinyl.name}
+          playlistName={vinyl.playlistName}
+          coverImageUrl={vinyl.coverImageUrl}
+          stickers={vinyl.stickers}
+          coverSize={320}
+        />
+
+        <p className="font-script text-gray-500 text-lg mt-10">
+          {vinyl.playlistName} · by {vinyl.name}
+        </p>
+
+        <a
+          href="/"
+          className="btn-tape text-base px-10 py-3 mt-8 inline-block"
+        >
+          Create yours
+        </a>
+      </main>
+    </div>
+  )
+}
