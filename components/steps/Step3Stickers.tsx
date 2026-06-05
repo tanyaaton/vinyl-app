@@ -23,7 +23,7 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
     <div className="flex flex-col items-center">
       <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">Decorate your vinyl case</h2>
 
-      <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={320} />
+      <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} size={420} />
 
       {/* Sticker picker */}
       <div className="flex gap-6 mt-8 items-end">

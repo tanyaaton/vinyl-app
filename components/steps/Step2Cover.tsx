@@ -23,7 +23,7 @@ export default function Step2Cover({ onBack, onNext }: Props) {
     <div className="flex flex-col items-center">
       <h2 className="font-jacquarda text-xl text-gray-700 mb-6 tracking-wider">Decorate your vinyl case</h2>
 
-      <VinylCover coverImageUrl={coverImagePreviewUrl} size={320} />
+      <VinylCover coverImageUrl={coverImagePreviewUrl} size={420} />
 
       <button
         className="font-jacquarda text-lg text-gray-500 mt-4 hover:text-gray-800 transition-colors"

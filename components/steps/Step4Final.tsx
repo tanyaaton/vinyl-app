@@ -70,7 +70,7 @@ export default function Step4Final() {
         playlistName={store.playlistName}
         coverImageUrl={store.coverImagePreviewUrl}
         stickers={store.stickers}
-        coverSize={300}
+        coverSize={380}
       />
 
       {/* Save status row */}

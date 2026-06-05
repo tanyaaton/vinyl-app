@@ -30,9 +30,9 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
   const labelOffset = (size - labelSize) / 2
   const cx = size / 2
   // "by name" sits ~30% from top of the label area (above the STEREO bar)
-  const nameY = labelOffset + labelSize * 0.30
+  const nameY = labelOffset + labelSize * 0.20
   // Playlist name sits ~44% from top of label area
-  const playlistY = labelOffset + labelSize * 0.44
+  const playlistY = labelOffset + labelSize * 0.4
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -55,7 +55,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
             y={nameY}
             textAnchor="middle"
             fontFamily="'Jacquarda', cursive"
-            fontSize={labelSize * 0.09}
+            fontSize={labelSize * 0.052}
             fill="#7B1818"
           >
             by {name}

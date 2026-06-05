@@ -15,10 +15,10 @@ const STICKER_IMAGES: Record<string, string> = {
 }
 
 const CORNER_STYLES: Record<string, React.CSSProperties> = {
-  'top-left':     { top: 8, left: 8 },
-  'top-right':    { top: 8, right: 8 },
-  'bottom-left':  { bottom: 8, left: 8 },
-  'bottom-right': { bottom: 8, right: 8 },
+  'top-left':     { top: 40, left: 40 },
+  'top-right':    { top: 50, right: 40 },
+  'bottom-left':  { bottom: 40, left: 40 },
+  'bottom-right': { bottom: 20, right: 60 },
 }
 
 export default function VinylCover({ coverImageUrl, stickers = [], name = '', size = 320 }: Props) {
@@ -37,12 +37,22 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
 
       {/* Layer 1: user cover image at 65% opacity */}
       {coverImageUrl && (
-        <img
-          src={coverImageUrl}
-          alt="Vinyl cover"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.65 }}
-        />
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            top: size * 0.072,
+            left: size * 0.087,
+            width: size * 0.825,
+            height: size * 0.862,
+          }}
+        >
+          <img
+            src={coverImageUrl}
+            alt="Vinyl cover"
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.65 }}
+          />
+        </div>
       )}
 
       {/* Stickers */}
@@ -63,7 +73,7 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
       {/* Name label at bottom-left */}
       {name && (
         <div className="absolute bottom-2 left-3">
-          <span className="font-jacquarda text-gray-700" style={{ fontSize: size * 0.055 }}>
+          <span className="font-jacquarda text-gray-700" style={{ fontSize: size * 0.05 }}>
             by {name}
           </span>
         </div>
