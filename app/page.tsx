@@ -20,7 +20,7 @@ export default function LandingPage() {
         />
 
         <div className="relative">
-          <VinylDisc size={448} />
+          <VinylDisc size={520} landing />
         </div>
 
         <Link href="/create">

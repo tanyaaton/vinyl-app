@@ -1,57 +1,48 @@
 /**
- * Vinyl disc composite:
- *   Layer 0 – vinyl-grooves.png  (full black disc, white center hole)
- *   Layer 1 – vinyl-label.png    (yellow label with STEREO / MUSIC RECORD baked in)
- *   Layer 2 – dynamic text       (user's name + playlist name, upper half of label)
- *
- * To swap assets: replace files in /public/ — no code change needed.
+ * VinylDisc — two modes:
+ *   landing=true  → vinyl-landing.png (arc texts + "Vinyl" script already baked in, no overlay)
+ *   landing=false → vinyl-base.png   + SVG overlay for user name + playlist name
  */
 interface Props {
   name?: string
   playlistName?: string
   size?: number
+  landing?: boolean
 }
 
-export default function VinylDisc({ name = '', playlistName = '', size = 448 }: Props) {
-  // Label at 1.05 — slightly overlaps the inner groove ring edge
-  const labelSize = size * 1
-  const labelOffset = (size - labelSize) / 2 
+export default function VinylDisc({ name = '', playlistName = '', size = 448, landing = false }: Props) {
+  if (landing) {
+    return (
+      <div className="relative shrink-0" style={{ width: size, height: size }}>
+        <img
+          src="/vinyl-landing.png"
+          alt="Vinyl record"
+          className="w-full h-full"
+          draggable={false}
+        />
+      </div>
+    )
+  }
 
-  const labelCentreX = size / 2
-  const nameY = labelOffset + labelSize * 0.35
-  const playlistY = labelOffset + labelSize * 0.45
+  // Step pages — base vinyl + SVG name/playlist overlay
+  // Label occupies roughly the inner 54% of the image diameter, centred
+  const labelSize = size * 0.54
+  const labelOffset = (size - labelSize) / 2
+  const cx = size / 2
+  // "by name" sits ~30% from top of the label area (above the STEREO bar)
+  const nameY = labelOffset + labelSize * 0.30
+  // Playlist name sits ~44% from top of label area
+  const playlistY = labelOffset + labelSize * 0.44
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      {/* Layer 0: groove ring */}
-      {/* Dark base fills the white gaps in the groove ring PNG center */}
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{ backgroundColor: '#111111' }}
-      />
-
       <img
-        src="/vinyl-grooves.png"
-        alt=""
-        className="absolute inset-0 w-full h-full"
+        src="/vinyl-base.png"
+        alt="Vinyl record"
+        className="w-full h-full"
         draggable={false}
       />
 
-      {/* Layer 1: yellow label centered */}
-      <img
-        src="/vinyl-label.png"
-        alt=""
-        className="absolute"
-        style={{
-          width: labelSize,
-          height: labelSize,
-          top: labelOffset,
-          left: labelOffset,
-        }}
-        draggable={false}
-      />
-
-      {/* Layer 2: dynamic text overlay */}
       <svg
         className="absolute inset-0"
         width={size}
@@ -60,11 +51,11 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448 }: 
       >
         {name && (
           <text
-            x={labelCentreX}
+            x={cx}
             y={nameY}
             textAnchor="middle"
             fontFamily="'Jacquarda', cursive"
-            fontSize={labelSize * 0.03}
+            fontSize={labelSize * 0.09}
             fill="#7B1818"
           >
             by {name}
@@ -72,11 +63,11 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448 }: 
         )}
         {playlistName && (
           <text
-            x={labelCentreX}
+            x={cx}
             y={playlistY}
             textAnchor="middle"
             fontFamily="'MrsSheppards', cursive"
-            fontSize={labelSize * 0.12}
+            fontSize={labelSize * 0.22}
             fill="#7B1818"
           >
             {playlistName}
