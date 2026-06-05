@@ -60,19 +60,38 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
       )}
 
       {/* Stickers */}
-      {stickers.map(({ stickerId, corner }) => (
-        <div
-          key={stickerId}
-          className="absolute"
-          style={{ ...CORNER_STYLES[corner], width: size * 0.25, height: size * 0.25 }}
-        >
-          <img
-            src={STICKER_IMAGES[stickerId]}
-            alt={stickerId}
-            className="w-full h-full object-contain"
-          />
-        </div>
-      ))}
+      {stickers.map(({ stickerId, corner, x, y, rotation }) => {
+        // Use random position if available, otherwise fall back to corner positioning
+        const useRandomPosition = x !== undefined && y !== undefined
+        const positionStyle = useRandomPosition
+          ? {
+              left: `${x}%`,
+              top: `${y}%`,
+              transform: `translate(-50%, -50%) rotate(${rotation || 0}deg)`,
+            }
+          : {
+              ...CORNER_STYLES[corner],
+              transform: `rotate(${rotation || 0}deg)`,
+            }
+        
+        return (
+          <div
+            key={stickerId}
+            className="absolute"
+            style={{
+              ...positionStyle,
+              width: size * 0.25,
+              height: size * 0.25
+            }}
+          >
+            <img
+              src={STICKER_IMAGES[stickerId]}
+              alt={stickerId}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )
+      })}
 
       {/* Name label at bottom-left, inside the cover with margin */}
       {name && (

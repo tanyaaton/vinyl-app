@@ -30,3 +30,5 @@ next-env.d.ts
 # cluade
 .cluade/
 launch.json
+
+.DS_Store

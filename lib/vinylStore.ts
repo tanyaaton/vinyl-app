@@ -54,7 +54,15 @@ export const useVinylStore = create<VinylStore>()(
         if (stickers.length >= 4) return
         const usedCorners = new Set(stickers.map((s) => s.corner))
         const corner = CORNER_ORDER.find((c) => !usedCorners.has(c))!
-        set({ stickers: [...stickers, { stickerId: id, corner }] })
+        
+        // Generate random position and rotation
+        // Position: 20-80% to keep stickers well within bounds (accounting for rotation)
+        const x = Math.floor(Math.random() * 60) + 20
+        const y = Math.floor(Math.random() * 60) + 20
+        // Rotation: -60 to +60 degrees
+        const rotation = Math.floor(Math.random() * 121) - 60
+        
+        set({ stickers: [...stickers, { stickerId: id, corner, x, y, rotation }] })
       },
 
       setVinylId: (id) => set({ vinylId: id }),

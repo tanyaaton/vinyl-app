@@ -5,6 +5,10 @@ export type StickerId = 'stars' | 'stamp' | 'psilove' | 'bow' | 'lips' | 'moon' 
 export interface StickerPlacement {
   stickerId: StickerId
   corner: StickerCorner
+  // Random positioning (percentage of cover area)
+  x?: number  // 0-100 (percentage from left)
+  y?: number  // 0-100 (percentage from top)
+  rotation?: number  // -60 to +60 degrees
 }
 
 export interface VinylData {
