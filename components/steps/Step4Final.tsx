@@ -31,6 +31,7 @@ export default function Step4Final() {
             name: store.name,
             playlistName: store.playlistName,
             coverImageFile: store.coverImageFile,
+            coverImageLayout: store.coverImageLayout,
             stickers: store.stickers,
             tracks: store.tracks,
             spotifyPlaylistId: store.selectedPlaylist?.id ?? null,
@@ -81,6 +82,7 @@ export default function Step4Final() {
             name={store.name}
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
+            coverImageLayout={store.coverImageLayout}
             stickers={store.stickers}
             tracks={store.tracks}
             coverSize={240}
@@ -92,6 +94,7 @@ export default function Step4Final() {
             name={store.name}
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
+            coverImageLayout={store.coverImageLayout}
             stickers={store.stickers}
             tracks={store.tracks}
             coverSize={380}

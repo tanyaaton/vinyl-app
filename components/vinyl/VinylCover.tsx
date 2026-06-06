@@ -1,7 +1,8 @@
-import type { StickerPlacement } from '@/lib/types'
+import type { StickerPlacement, CoverImageLayout } from '@/lib/types'
 
 interface Props {
   coverImageUrl?: string | null
+  coverImageLayout?: CoverImageLayout
   stickers?: StickerPlacement[]
   name?: string
   tracks?: string[]
@@ -26,7 +27,25 @@ const CORNER_STYLES: Record<string, React.CSSProperties> = {
   'bottom-right': { bottom: 20, right: 60 },
 }
 
-export default function VinylCover({ coverImageUrl, stickers = [], name = '', tracks = [], size = 320 }: Props) {
+export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', stickers = [], name = '', tracks = [], size = 320 }: Props) {
+  const imageBoxStyle: React.CSSProperties =
+    coverImageLayout === 'top-right'
+      ? {
+          // Top-right badge, anchored with the same margin the base sleeve PNG
+          // uses for its front panel (~7% top, ~8.7% right).
+          top: size * 0.072,
+          right: size * 0.087,
+          width: size * 0.35,
+          height: size * 0.35,
+        }
+      : {
+          // Full bleed: image is exactly the size and position of the base cover.
+          top: 0,
+          left: 0,
+          width: size,
+          height: size,
+        }
+
   return (
     <div
       className="relative shrink-0 overflow-hidden shadow-md"
@@ -40,17 +59,9 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', tr
         draggable={false}
       />
 
-      {/* Layer 1: user cover image at 65% opacity */}
+      {/* Layer 1: user cover image (semi-transparent so the paper base shows through) */}
       {coverImageUrl && (
-        <div
-          className="absolute overflow-hidden"
-          style={{
-            top: size * 0.072,
-            left: size * 0.087,
-            width: size * 0.825,
-            height: size * 0.862,
-          }}
-        >
+        <div className="absolute overflow-hidden" style={imageBoxStyle}>
           <img
             src={coverImageUrl}
             alt="Vinyl cover"

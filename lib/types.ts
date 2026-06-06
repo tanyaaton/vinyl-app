@@ -2,6 +2,8 @@ export type StickerCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-r
 
 export type StickerId = 'stars' | 'stamp' | 'psilove' | 'bow' | 'lips' | 'moon' | 'bluestamp' | 'tulips'
 
+export type CoverImageLayout = 'full' | 'top-right'
+
 export interface StickerPlacement {
   stickerId: StickerId
   corner: StickerCorner
@@ -16,6 +18,7 @@ export interface VinylData {
   name: string
   playlistName: string
   coverImageUrl: string | null
+  coverImageLayout?: CoverImageLayout
   stickers: StickerPlacement[]
   tracks: string[]
   createdAt: string

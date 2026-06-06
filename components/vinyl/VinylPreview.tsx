@@ -6,12 +6,13 @@
 import { useState } from 'react'
 import VinylDisc from './VinylDisc'
 import VinylCover from './VinylCover'
-import type { StickerPlacement } from '@/lib/types'
+import type { StickerPlacement, CoverImageLayout } from '@/lib/types'
 
 interface Props {
   name: string
   playlistName: string
   coverImageUrl?: string | null
+  coverImageLayout?: CoverImageLayout
   stickers?: StickerPlacement[]
   tracks?: string[]
   coverSize?: number
@@ -22,6 +23,7 @@ export default function VinylPreview({
   name,
   playlistName,
   coverImageUrl,
+  coverImageLayout = 'full',
   stickers = [],
   tracks = [],
   coverSize = 300,
@@ -47,6 +49,7 @@ export default function VinylPreview({
       >
         <VinylCover
           coverImageUrl={coverImageUrl}
+          coverImageLayout={coverImageLayout}
           stickers={stickers}
           name={name}
           tracks={tracks}

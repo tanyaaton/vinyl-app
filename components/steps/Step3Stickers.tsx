@@ -20,7 +20,7 @@ const STICKERS: { id: StickerId; label: string }[] = [
 ]
 
 export default function Step3Stickers({ onBack, onNext }: Props) {
-  const { coverImagePreviewUrl, stickers, name, toggleSticker, tracks } = useVinylStore()
+  const { coverImagePreviewUrl, coverImageLayout, stickers, name, toggleSticker, tracks } = useVinylStore()
   const placedIds = new Set(stickers.map((s) => s.stickerId))
 
   return (
@@ -29,10 +29,10 @@ export default function Step3Stickers({ onBack, onNext }: Props) {
 
       <div className="w-full flex justify-center">
         <div className="sm:hidden">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} tracks={tracks} size={280} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} stickers={stickers} name={name} tracks={tracks} size={280} />
         </div>
         <div className="hidden sm:block">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} stickers={stickers} name={name} tracks={tracks} size={420} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} stickers={stickers} name={name} tracks={tracks} size={420} />
         </div>
       </div>
 
