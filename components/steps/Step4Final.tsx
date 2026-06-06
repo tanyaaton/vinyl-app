@@ -38,6 +38,7 @@ export default function Step4Final({ onBack }: Props) {
           playlistName: store.playlistName,
           coverImageFile: store.coverImageFile,
           coverImageLayout: store.coverImageLayout,
+          trackTextColor: store.trackTextColor,
           vinylColor: store.vinylColor,
           stickers: store.stickers,
           tracks: store.tracks,
@@ -86,6 +87,7 @@ export default function Step4Final({ onBack }: Props) {
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
             coverImageLayout={store.coverImageLayout}
+            trackTextColor={store.trackTextColor}
             vinylColor={store.vinylColor}
             stickers={store.stickers}
             tracks={store.tracks}
@@ -99,6 +101,7 @@ export default function Step4Final({ onBack }: Props) {
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
             coverImageLayout={store.coverImageLayout}
+            trackTextColor={store.trackTextColor}
             vinylColor={store.vinylColor}
             stickers={store.stickers}
             tracks={store.tracks}

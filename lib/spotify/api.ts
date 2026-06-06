@@ -266,11 +266,11 @@ export async function getFirstNTracks(
 /**
  * Format track for display on vinyl cover
  * @param track - Spotify track
- * @returns Formatted string "Artist Name - Track Name"
+ * @returns Formatted string "Track Name - Artist Name"
  */
 export function formatTrackForVinyl(track: SpotifyTrack): string {
   const artistNames = track.artists.map(artist => artist.name).join(', ');
-  return `${artistNames} - ${track.name}`;
+  return `${track.name} - ${artistNames}`;
 }
 
 /**

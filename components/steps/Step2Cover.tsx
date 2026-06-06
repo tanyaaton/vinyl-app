@@ -12,7 +12,7 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif']
 const ACCEPTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.heic', '.heif']
 
 export default function Step2Cover({ onBack, onNext }: Props) {
-  const { coverImagePreviewUrl, coverImageLayout, setCoverImage, setCoverImageLayout, tracks } = useVinylStore()
+  const { coverImagePreviewUrl, coverImageLayout, trackTextColor, setCoverImage, setCoverImageLayout, setTrackTextColor, tracks } = useVinylStore()
   const inputRef = useRef<HTMLInputElement>(null)
   const [fileError, setFileError] = useState<string | null>(null)
 
@@ -39,10 +39,10 @@ export default function Step2Cover({ onBack, onNext }: Props) {
 
       <div className="w-full flex justify-center">
         <div className="sm:hidden">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} tracks={tracks} size={280} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} trackTextColor={trackTextColor} tracks={tracks} size={280} />
         </div>
         <div className="hidden sm:block">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} tracks={tracks} size={420} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} coverImageLayout={coverImageLayout} trackTextColor={trackTextColor} tracks={tracks} size={420} />
         </div>
       </div>
 
@@ -91,6 +91,41 @@ export default function Step2Cover({ onBack, onNext }: Props) {
           </button>
         </div>
       )}
+
+      {/* Text color selector */}
+      <div className="flex items-center gap-3 mt-3 sm:mt-4">
+        <span className="font-jacquarda text-sm sm:text-base text-gray-500">text color:</span>
+        <button
+          type="button"
+          onClick={() => setTrackTextColor('white')}
+          className={`w-6 h-6 rounded-full bg-white border-2 transition-all ${
+            trackTextColor === 'white'
+              ? 'border-gray-800 scale-110'
+              : 'border-gray-300 hover:border-gray-500 hover:scale-105'
+          }`}
+          title="White"
+        />
+        <button
+          type="button"
+          onClick={() => setTrackTextColor('gray')}
+          className={`w-6 h-6 rounded-full bg-gray-500 border-2 transition-all ${
+            trackTextColor === 'gray'
+              ? 'border-gray-800 scale-110'
+              : 'border-gray-300 hover:border-gray-500 hover:scale-105'
+          }`}
+          title="Gray"
+        />
+        <button
+          type="button"
+          onClick={() => setTrackTextColor('black')}
+          className={`w-6 h-6 rounded-full bg-black border-2 transition-all ${
+            trackTextColor === 'black'
+              ? 'border-gray-800 scale-110'
+              : 'border-gray-300 hover:border-gray-500 hover:scale-105'
+          }`}
+          title="Black"
+        />
+      </div>
 
       <div className="flex gap-4 sm:gap-8 mt-8 sm:mt-12">
         <button className="btn-tape text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3" onClick={onBack}>Back</button>

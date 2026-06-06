@@ -4,6 +4,8 @@ export type StickerId = 'stars' | 'stamp' | 'psilove' | 'bow' | 'lips' | 'moon' 
 
 export type CoverImageLayout = 'full' | 'top-right'
 
+export type TrackTextColor = 'white' | 'gray' | 'black'
+
 export type VinylColor = 'default' | 'red' | 'pink' | 'blue'
 
 export interface StickerPlacement {
@@ -21,6 +23,7 @@ export interface VinylData {
   playlistName: string
   coverImageUrl: string | null
   coverImageLayout?: CoverImageLayout
+  trackTextColor?: TrackTextColor
   vinylColor?: VinylColor
   stickers: StickerPlacement[]
   tracks: string[]

@@ -1,8 +1,9 @@
-import type { StickerPlacement, CoverImageLayout } from '@/lib/types'
+import type { StickerPlacement, CoverImageLayout, TrackTextColor } from '@/lib/types'
 
 interface Props {
   coverImageUrl?: string | null
   coverImageLayout?: CoverImageLayout
+  trackTextColor?: TrackTextColor
   stickers?: StickerPlacement[]
   name?: string
   tracks?: string[]
@@ -27,7 +28,7 @@ const CORNER_STYLES: Record<string, React.CSSProperties> = {
   'bottom-right': { bottom: 20, right: 60 },
 }
 
-export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', stickers = [], name = '', tracks = [], size = 320 }: Props) {
+export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', trackTextColor = 'gray', stickers = [], name = '', tracks = [], size = 320 }: Props) {
   const imageBoxStyle: React.CSSProperties =
     coverImageLayout === 'top-right'
       ? {
@@ -54,6 +55,13 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
   const sideA = realTracks.slice(0, sideACount)
   const sideB = realTracks.slice(sideACount)
 
+  // Map text color to Tailwind classes
+  const textColorClass = {
+    white: 'text-white',
+    gray: 'text-gray-700',
+    black: 'text-black'
+  }[trackTextColor]
+
   return (
     <div
       className="relative shrink-0 overflow-hidden shadow-md"
@@ -67,14 +75,14 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
         draggable={false}
       />
 
-      {/* Layer 1: user cover image (semi-transparent so the paper base shows through) */}
+      {/* Layer 1: user cover image (semi-transparent for full cover, opaque for top-right) */}
       {coverImageUrl && (
         <div className="absolute overflow-hidden" style={imageBoxStyle}>
           <img
             src={coverImageUrl}
             alt="Vinyl cover"
             className="w-full h-full object-cover"
-            style={{ opacity: 0.65 }}
+            style={{ opacity: coverImageLayout === 'top-right' ? 0.85 : 0.75 }}
           />
         </div>
       )}
@@ -129,11 +137,11 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
           }}
         >
           <div
-            className="text-gray-700"
+            className={textColorClass}
             style={{
               fontFamily: 'Jacquarda, cursive',
               fontSize: size * 0.0255,
-              opacity: 0.7,
+              opacity: 0.8,
               lineHeight: '1.15',
             }}
           >
