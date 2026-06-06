@@ -1,59 +1,66 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useVinylStore } from '@/lib/vinylStore'
 import { saveVinyl } from '@/lib/vinylService'
 import VinylPreview from '@/components/vinyl/VinylPreview'
 
-type SaveState = 'saving' | 'done' | 'error'
+type SaveState = 'idle' | 'saving' | 'done' | 'error'
 
-export default function Step4Final() {
+interface Props {
+  onBack: () => void
+}
+
+export default function Step4Final({ onBack }: Props) {
   const router = useRouter()
   const store = useVinylStore()
   const [shareUrl, setShareUrl] = useState('')
-  const [saveState, setSaveState] = useState<SaveState>('saving')
+  const [saveState, setSaveState] = useState<SaveState>('idle')
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  const hasSaved = useRef(false)
 
-  useEffect(() => {
-    if (hasSaved.current) return
-    hasSaved.current = true
+  async function handleGenerate() {
+    setSaveState('saving')
+    setSaveError(null)
 
     const timeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Save timed out')), 15_000)
     )
 
-    async function save() {
-      try {
-        const id = await Promise.race([
-          saveVinyl({
-            name: store.name,
-            playlistName: store.playlistName,
-            coverImageFile: store.coverImageFile,
-            stickers: store.stickers,
-            tracks: store.tracks,
-            spotifyPlaylistId: store.selectedPlaylist?.id ?? null,
-            spotifyPlaylistUrl:
-              store.selectedPlaylist?.external_urls?.spotify ??
-              (store.selectedPlaylist
-                ? `https://open.spotify.com/playlist/${store.selectedPlaylist.id}`
-                : null),
-            spotifyUserId: store.spotifyUser?.id ?? null,
-          }),
-          timeout,
-        ])
-        store.setVinylId(id)
-        setShareUrl(`${window.location.origin}/vinyl/${id}`)
-        setSaveState('done')
-      } catch (e) {
-        console.error('Save failed:', e)
-        setSaveState('error')
-      }
+    try {
+      const id = await Promise.race([
+        saveVinyl({
+          // Reuse the same id (and storage path) if we've already saved this
+          // vinyl in the session. Keeps Firestore + Storage from accumulating
+          // orphaned docs/files when the user edits and regenerates.
+          id: store.vinylId,
+          name: store.name,
+          playlistName: store.playlistName,
+          coverImageFile: store.coverImageFile,
+          coverImageLayout: store.coverImageLayout,
+          trackTextColor: store.trackTextColor,
+          vinylColor: store.vinylColor,
+          stickers: store.stickers,
+          tracks: store.tracks,
+          spotifyPlaylistId: store.selectedPlaylist?.id ?? null,
+          spotifyPlaylistUrl:
+            store.selectedPlaylist?.external_urls?.spotify ??
+            (store.selectedPlaylist
+              ? `https://open.spotify.com/playlist/${store.selectedPlaylist.id}`
+              : null),
+          spotifyUserId: store.spotifyUser?.id ?? null,
+        }),
+        timeout,
+      ])
+      store.setVinylId(id)
+      setShareUrl(`${window.location.origin}/vinyl/${id}`)
+      setSaveState('done')
+    } catch (e) {
+      console.error('Save failed:', e)
+      setSaveError(e instanceof Error ? e.message : String(e))
+      setSaveState('error')
     }
-
-    save()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }
 
   function handleCopy() {
     navigator.clipboard.writeText(shareUrl)
@@ -79,6 +86,9 @@ export default function Step4Final() {
             name={store.name}
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
+            coverImageLayout={store.coverImageLayout}
+            trackTextColor={store.trackTextColor}
+            vinylColor={store.vinylColor}
             stickers={store.stickers}
             tracks={store.tracks}
             coverSize={240}
@@ -90,6 +100,9 @@ export default function Step4Final() {
             name={store.name}
             playlistName={store.playlistName}
             coverImageUrl={store.coverImagePreviewUrl}
+            coverImageLayout={store.coverImageLayout}
+            trackTextColor={store.trackTextColor}
+            vinylColor={store.vinylColor}
             stickers={store.stickers}
             tracks={store.tracks}
             coverSize={380}
@@ -102,15 +115,21 @@ export default function Step4Final() {
       <div className="mt-6 sm:mt-10 flex flex-col items-center gap-3 w-full max-w-lg">
         {saveState === 'saving' && (
           <p className="font-jacquarda text-sm text-gray-400 animate-pulse">
-            saving your vinyl…
+            generating share link…
           </p>
         )}
 
         {saveState === 'error' && (
-          <p className="font-courier text-xs text-amber-700 text-center max-w-sm">
-            ⚠ Could not save — Firebase is not configured yet. Fill in{' '}
-            <code>.env.local</code> with your Firebase keys to enable share links.
-          </p>
+          <div className="flex flex-col items-center gap-2 max-w-md">
+            <p className="font-jacquarda text-sm text-red-700 text-center">
+              Could not save your vinyl.
+            </p>
+            {saveError && (
+              <p className="font-courier text-xs text-amber-700 text-center break-all">
+                {saveError}
+              </p>
+            )}
+          </div>
         )}
 
         {saveState === 'done' && shareUrl && (
@@ -123,17 +142,17 @@ export default function Step4Final() {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base self-center"
+                className="btn-tape px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base self-center"
               >
                 ♫ open in spotify
               </a>
             )}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
-              <span className="font-jacquarda text-base sm:text-xl text-gray-600 sm:whitespace-nowrap">
-                Share this vinyl
-              </span>
-              <input readOnly value={shareUrl} className="vinyl-input flex-1 text-xs sm:text-sm" />
-              <button className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base" onClick={handleCopy}>
+            <span className="font-jacquarda text-base sm:text-xl text-gray-600">
+              Share this vinyl
+            </span>
+            <div className="flex flex-row items-center gap-2 w-full">
+              <input readOnly value={shareUrl} className="vinyl-input flex-1 min-w-0 text-xs sm:text-sm" />
+              <button className="btn-tape px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base shrink-0" onClick={handleCopy}>
                 {copied ? 'copied!' : 'copy'}
               </button>
             </div>
@@ -141,12 +160,35 @@ export default function Step4Final() {
         )}
       </div>
 
-      <button
-        className="font-jacquarda text-base text-gray-400 hover:text-gray-700 mt-8 transition-colors"
-        onClick={handleStartOver}
-      >
-        ↩ start over
-      </button>
+      {/* Action buttons */}
+      <div className="flex gap-4 sm:gap-8 mt-8 sm:mt-12">
+        {saveState !== 'saving' && (
+          <button
+            className="btn-tape text-sm sm:text-lg px-4 sm:px-10 py-1.5 sm:py-3"
+            onClick={onBack}
+          >
+            Back
+          </button>
+        )}
+
+        {(saveState === 'idle' || saveState === 'error') && (
+          <button
+            className="btn-tape text-sm sm:text-lg px-4 sm:px-10 py-1.5 sm:py-3"
+            onClick={handleGenerate}
+          >
+            {saveState === 'error' ? 'Retry' : 'Generate share link'}
+          </button>
+        )}
+      </div>
+
+      {saveState === 'done' && (
+        <button
+          className="font-jacquarda text-base text-gray-400 hover:text-gray-700 mt-8 transition-colors"
+          onClick={handleStartOver}
+        >
+          ↩ start over
+        </button>
+      )}
     </div>
   )
 }

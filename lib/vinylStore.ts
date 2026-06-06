@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StickerPlacement, StickerId, StickerCorner, SpotifyUser, SpotifyPlaylist } from './types'
+import type { StickerPlacement, StickerId, StickerCorner, SpotifyUser, SpotifyPlaylist, CoverImageLayout, VinylColor, TrackTextColor } from './types'
 
 const CORNER_ORDER: StickerCorner[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 
@@ -10,6 +10,9 @@ interface VinylStore {
   playlistName: string
   coverImageFile: File | null
   coverImagePreviewUrl: string | null
+  coverImageLayout: CoverImageLayout
+  trackTextColor: TrackTextColor
+  vinylColor: VinylColor
   stickers: StickerPlacement[]
   tracks: string[]
   vinylId: string | null
@@ -19,6 +22,9 @@ interface VinylStore {
   setName: (name: string) => void
   setPlaylistName: (name: string) => void
   setCoverImage: (file: File) => void
+  setCoverImageLayout: (layout: CoverImageLayout) => void
+  setTrackTextColor: (color: TrackTextColor) => void
+  setVinylColor: (color: VinylColor) => void
   toggleSticker: (id: StickerId) => void
   setVinylId: (id: string) => void
   setTracks: (tracks: string[]) => void
@@ -33,6 +39,9 @@ const initialState = {
   playlistName: '',
   coverImageFile: null,
   coverImagePreviewUrl: null,
+  coverImageLayout: 'full' as CoverImageLayout,
+  trackTextColor: 'gray' as TrackTextColor,
+  vinylColor: 'default' as VinylColor,
   stickers: [] as StickerPlacement[],
   tracks: ['song1', 'song2', 'song3', 'song4', 'song5', 'song6', 'song7', 'song8', 'song9', 'song10', 'song11', 'song12'],
   vinylId: null,
@@ -63,6 +72,12 @@ export const useVinylStore = create<VinylStore>()(
         if (prev) URL.revokeObjectURL(prev)
         set({ coverImageFile: file, coverImagePreviewUrl: URL.createObjectURL(file) })
       },
+
+      setCoverImageLayout: (coverImageLayout) => set({ coverImageLayout }),
+
+      setTrackTextColor: (trackTextColor) => set({ trackTextColor }),
+
+      setVinylColor: (vinylColor) => set({ vinylColor }),
 
       toggleSticker: (id) => {
         const { stickers } = get()
@@ -135,6 +150,9 @@ export const useVinylStore = create<VinylStore>()(
         ({
           name: state.name,
           playlistName: state.playlistName,
+          coverImageLayout: state.coverImageLayout,
+          trackTextColor: state.trackTextColor,
+          vinylColor: state.vinylColor,
           stickers: state.stickers,
           tracks: ensureTracksLength(state.tracks),
           vinylId: state.vinylId,

@@ -40,6 +40,9 @@ export default async function SharePage({ params }: Props) {
               name={vinyl.name}
               playlistName={vinyl.playlistName}
               coverImageUrl={vinyl.coverImageUrl}
+              coverImageLayout={vinyl.coverImageLayout}
+              trackTextColor={vinyl.trackTextColor}
+              vinylColor={vinyl.vinylColor}
               stickers={vinyl.stickers}
               tracks={vinyl.tracks}
               coverSize={240}
@@ -51,6 +54,9 @@ export default async function SharePage({ params }: Props) {
               name={vinyl.name}
               playlistName={vinyl.playlistName}
               coverImageUrl={vinyl.coverImageUrl}
+              coverImageLayout={vinyl.coverImageLayout}
+              trackTextColor={vinyl.trackTextColor}
+              vinylColor={vinyl.vinylColor}
               stickers={vinyl.stickers}
               tracks={vinyl.tracks}
               coverSize={320}

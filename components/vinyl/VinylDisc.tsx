@@ -1,17 +1,29 @@
+import type { VinylColor } from '@/lib/types'
+
 /**
  * VinylDisc — two modes:
  *   landing=true  → vinyl-landing.png (arc texts + "Vinyl" script already baked in, no overlay)
- *   landing=false → vinyl-base.png   + SVG overlay for user name + playlist name
+ *   landing=false → vinyl base PNG (color-dependent) + SVG overlay for user name + playlist name
  */
 interface Props {
   name?: string
   playlistName?: string
   size?: number
   landing?: boolean
+  vinylColor?: VinylColor
   className?: string
 }
 
-export default function VinylDisc({ name = '', playlistName = '', size = 448, landing = false, className = '' }: Props) {
+// Per-color base PNG + SVG text fill. RGB values for non-default colors come
+// from the user's brief: red 153,5,5 / pink 92,10,31 / blue 242,241,240.
+export const VINYL_COLOR_STYLE: Record<VinylColor, { base: string; text: string }> = {
+  default: { base: '/vinyl-base.png',      text: '#7B1818' },
+  red:     { base: '/vinyl-base-red.png',  text: '#790404' },
+  pink:    { base: '/vinyl-base-pink.png', text: '#181718' },
+  blue:    { base: '/vinyl-base-blue.png', text: '#eae2d9' },
+}
+
+export default function VinylDisc({ name = '', playlistName = '', size = 448, landing = false, vinylColor = 'default', className = '' }: Props) {
   if (landing) {
     return (
       <div className={`relative shrink-0 ${className}`} style={{ width: size, height: size }}>
@@ -24,6 +36,8 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
       </div>
     )
   }
+
+  const { base, text } = VINYL_COLOR_STYLE[vinylColor]
 
   // Step pages — base vinyl + SVG name/playlist overlay
   // Label occupies roughly the inner 54% of the image diameter, centred
@@ -38,7 +52,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
   return (
     <div className={`relative shrink-0 ${className}`} style={{ width: size, height: size }}>
       <img
-        src="/vinyl-base.png"
+        src={base}
         alt="Vinyl record"
         className="w-full h-full"
         draggable={false}
@@ -57,7 +71,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
             textAnchor="middle"
             fontFamily="'Jacquarda', cursive"
             fontSize={labelSize * 0.052}
-            fill="#7B1818"
+            fill={text}
           >
             by {name}
           </text>
@@ -69,7 +83,7 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
             textAnchor="middle"
             fontFamily="'MrsSheppards', cursive"
             fontSize={labelSize * 0.22}
-            fill="#7B1818"
+            fill={text}
           >
             {playlistName}
           </text>

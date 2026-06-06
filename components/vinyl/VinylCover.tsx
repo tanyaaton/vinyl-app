@@ -1,7 +1,9 @@
-import type { StickerPlacement } from '@/lib/types'
+import type { StickerPlacement, CoverImageLayout, TrackTextColor } from '@/lib/types'
 
 interface Props {
   coverImageUrl?: string | null
+  coverImageLayout?: CoverImageLayout
+  trackTextColor?: TrackTextColor
   stickers?: StickerPlacement[]
   name?: string
   tracks?: string[]
@@ -26,7 +28,40 @@ const CORNER_STYLES: Record<string, React.CSSProperties> = {
   'bottom-right': { bottom: 20, right: 60 },
 }
 
-export default function VinylCover({ coverImageUrl, stickers = [], name = '', tracks = [], size = 320 }: Props) {
+export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', trackTextColor = 'gray', stickers = [], name = '', tracks = [], size = 320 }: Props) {
+  const imageBoxStyle: React.CSSProperties =
+    coverImageLayout === 'top-right'
+      ? {
+          // Top-right badge, anchored with the same margin the base sleeve PNG
+          // uses for its front panel (~7% top, ~8.7% right).
+          top: size * 0.072,
+          right: size * 0.087,
+          width: size * 0.35,
+          height: size * 0.35,
+        }
+      : {
+          // Full bleed: image is exactly the size and position of the base cover.
+          top: 0,
+          left: 0,
+          width: size,
+          height: size,
+        }
+
+  // Filter out the empty/padded slots getVinylTrackList emits so the rendered
+  // tracklist is consecutive (no large gaps from blank lines). Side A gets the
+  // ceiling half so an odd count puts the extra song on Side A.
+  const realTracks = tracks.filter((t) => t && t.trim() !== '')
+  const sideACount = Math.ceil(realTracks.length / 2)
+  const sideA = realTracks.slice(0, sideACount)
+  const sideB = realTracks.slice(sideACount)
+
+  // Map text color to Tailwind classes
+  const textColorClass = {
+    white: 'text-white',
+    gray: 'text-gray-700',
+    black: 'text-black'
+  }[trackTextColor]
+
   return (
     <div
       className="relative shrink-0 overflow-hidden shadow-md"
@@ -40,22 +75,21 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', tr
         draggable={false}
       />
 
-      {/* Layer 1: user cover image at 65% opacity */}
+      {/* Layer 1: user cover image (semi-transparent for full cover, opaque for top-right) */}
       {coverImageUrl && (
-        <div
-          className="absolute overflow-hidden"
-          style={{
-            top: size * 0.072,
-            left: size * 0.087,
-            width: size * 0.825,
-            height: size * 0.862,
-          }}
-        >
+        <div className="absolute overflow-hidden" style={imageBoxStyle}>
           <img
             src={coverImageUrl}
             alt="Vinyl cover"
             className="w-full h-full object-cover"
-            style={{ opacity: 0.65 }}
+            style={{ opacity: coverImageLayout === 'top-right' ? 0.85 : 0.75 }}
+          />
+          {/* Gradient shadow overlay for depth */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 20% 20%, transparent 0%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0.6) 100%)',
+            }}
           />
         </div>
       )}
@@ -74,7 +108,7 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', tr
               ...CORNER_STYLES[corner],
               transform: `rotate(${rotation || 0}deg)`,
             }
-        
+
         return (
           <div
             key={stickerId}
@@ -94,34 +128,42 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', tr
         )
       })}
 
-      {/* Track list at bottom-left, inside the cover with margin */}
-      {tracks.length > 0 && (
+      {/*
+        Track list at bottom-left. Anchored to `bottom` so the last rendered
+        line always sits at the same bottom margin regardless of how many
+        tracks there are.
+      */}
+      {realTracks.length > 0 && (
         <div
           className="absolute"
           style={{
-            bottom: size * 0.05,  // More space from bottom to fit all tracks
-            left: size * 0.02 + size * 0.03,    // Align with cover left edge + margin
-            maxWidth: size * 0.825 - size * 0.06, // Stay within cover bounds with margin
-            maxHeight: size * 0.45,  // Increased height for all 12 tracks + labels
+            bottom: size * 0.05,
+            left: size * 0.05,
+            maxWidth: size * 0.825 - size * 0.06,
+            maxHeight: size * 0.45,
           }}
         >
           <div
-            className="text-gray-700"
+            className={textColorClass}
             style={{
               fontFamily: 'Jacquarda, cursive',
-              fontSize: size * 0.0255,  // Smaller font to fit all tracks
-              opacity: 0.7,
-              lineHeight: '1.15'  // Tighter line height to fit all tracks
+              fontSize: size * 0.0255,
+              opacity: 0.8,
+              lineHeight: '1.15',
             }}
           >
             <div className="font-semibold" style={{ marginBottom: size * 0.005 }}>Side A</div>
-            {tracks.slice(0, 6).map((track, i) => (
-              <div key={`a-${i}`} className="truncate">{track || ' '}</div>
+            {sideA.map((track, i) => (
+              <div key={`a-${i}`} className="truncate">{track}</div>
             ))}
-            <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
-            {tracks.slice(6, 12).map((track, i) => (
-              <div key={`b-${i}`} className="truncate">{track || ' '}</div>
-            ))}
+            {sideB.length > 0 && (
+              <>
+                <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
+                {sideB.map((track, i) => (
+                  <div key={`b-${i}`} className="truncate">{track}</div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       )}

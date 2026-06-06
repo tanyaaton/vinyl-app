@@ -34,12 +34,17 @@ export default function SpotifyConnect({ onBack, onNext }: Props) {
   const justAuthed = searchParams.get('auth') === 'success'
 
   const {
+    name,
     spotifyUser,
     selectedPlaylist,
+    setName,
+    setPlaylistName,
     setSpotifyUser,
     setSelectedPlaylist,
     setTracks,
   } = useVinylStore()
+
+  const truncate8 = (s: string) => (s.length > 8 ? s.slice(0, 8) : s)
 
   // Default to 'idle' (show the Connect button) so the login step is always
   // explicit. The only time we skip 'idle' is when the OAuth callback redirected
@@ -107,7 +112,17 @@ export default function SpotifyConnect({ onBack, onNext }: Props) {
     setStatus('continuing')
     setErrorMessage(null)
     try {
+      // If the picked playlist changed since last time, refresh the album
+      // prefill so Step 2 reflects the new pick (don't overwrite if the user
+      // re-confirmed the same playlist — they may have edited the album field).
+      const playlistChanged = pendingSelection.id !== selectedPlaylist?.id
       setSelectedPlaylist(pendingSelection)
+      if (playlistChanged) {
+        setPlaylistName(truncate8(pendingSelection.name))
+      }
+      if (spotifyUser?.display_name && !name) {
+        setName(spotifyUser.display_name)
+      }
       const formatted = await getVinylTrackList(pendingSelection.id)
       setTracks(formatted)
       onNext()
@@ -123,7 +138,7 @@ export default function SpotifyConnect({ onBack, onNext }: Props) {
   return (
     <div className="flex flex-col items-center w-full px-4">
       <h2 className="font-jacquarda text-lg sm:text-xl text-gray-700 mb-4 sm:mb-6 tracking-wider">
-        {showGridArea ? 'Pick your playlist' : 'Log in to Spotify'}
+        Pick your playlist
       </h2>
 
       {callbackError && status === 'idle' && (
@@ -136,7 +151,8 @@ export default function SpotifyConnect({ onBack, onNext }: Props) {
 
       {status === 'idle' && (
         <div className="flex flex-col items-center gap-4 my-8">
-          <p className="font-jacquarda text-base text-gray-600 text-center max-w-sm">
+          <SpotifyLogo className="w-12 h-12 sm:w-16 sm:h-16" />
+          <p className="font-courier text-sm sm:text-base text-gray-600 text-center max-w-sm leading-relaxed">
             Connect your Spotify account to pick a playlist for your vinyl.
           </p>
           <button
@@ -200,21 +216,23 @@ export default function SpotifyConnect({ onBack, onNext }: Props) {
               </a>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
-              {filtered.map((p) => (
-                <PlaylistCard
-                  key={p.id}
-                  playlist={p}
-                  selected={pendingSelection?.id === p.id}
-                  disabled={status === 'continuing'}
-                  onSelect={() => setPendingSelection(p)}
-                />
-              ))}
-              {filtered.length === 0 && (
-                <p className="col-span-full text-center font-jacquarda text-sm text-gray-500 py-6">
-                  No playlists match &quot;{query}&quot;
-                </p>
-              )}
+            <div className="w-full max-h-[420px] sm:max-h-[460px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
+                {filtered.map((p) => (
+                  <PlaylistCard
+                    key={p.id}
+                    playlist={p}
+                    selected={pendingSelection?.id === p.id}
+                    disabled={status === 'continuing'}
+                    onSelect={() => setPendingSelection(p)}
+                  />
+                ))}
+                {filtered.length === 0 && (
+                  <p className="col-span-full text-center font-jacquarda text-sm text-gray-500 py-6">
+                    No playlists match &quot;{query}&quot;
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -302,6 +320,23 @@ function PlaylistCard({
         {playlist.tracks.total} tracks · {playlist.owner.display_name}
       </p>
     </button>
+  )
+}
+
+function SpotifyLogo({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 168 168"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+      role="img"
+    >
+      <path
+        fill="#1ED760"
+        d="M83.996.277C37.747.277.253 37.77.253 84.019c0 46.251 37.494 83.741 83.743 83.741 46.254 0 83.744-37.49 83.744-83.741 0-46.246-37.49-83.738-83.745-83.738zm38.404 120.78a5.217 5.217 0 0 1-7.18 1.73c-19.662-12.01-44.414-14.73-73.564-8.07a5.222 5.222 0 0 1-6.249-3.93 5.213 5.213 0 0 1 3.926-6.25c31.9-7.291 59.263-4.15 81.337 9.34 2.46 1.51 3.24 4.72 1.73 7.18zm10.25-22.805c-1.89 3.075-5.91 4.045-8.98 2.155-22.51-13.839-56.823-17.846-83.448-9.764-3.453 1.043-7.1-.903-8.148-4.35-1.04-3.453.907-7.093 4.354-8.143 30.413-9.228 68.222-4.758 94.072 11.127 3.07 1.89 4.04 5.91 2.15 8.976v-.001zm.88-23.744c-26.99-16.031-71.52-17.505-97.289-9.684-4.138 1.255-8.514-1.081-9.768-5.219-1.254-4.14 1.08-8.513 5.221-9.771 29.581-8.98 78.756-7.245 109.83 11.202 3.722 2.207 4.929 7.012 2.722 10.733-2.2 3.722-7.02 4.949-10.73 2.739z"
+      />
+    </svg>
   )
 }
 
