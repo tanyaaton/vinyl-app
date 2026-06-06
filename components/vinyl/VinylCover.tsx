@@ -84,6 +84,13 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', t
             className="w-full h-full object-cover"
             style={{ opacity: coverImageLayout === 'top-right' ? 0.85 : 0.75 }}
           />
+          {/* Gradient shadow overlay for depth */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 20% 20%, transparent 0%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0.6) 100%)',
+            }}
+          />
         </div>
       )}
 
