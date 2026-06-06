@@ -237,7 +237,7 @@ export async function getPlaylistTracks(
     spotifyFetch<{
       items: Array<{ track: SpotifyTrack }>;
       total: number;
-    }>(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`)
+    }>(`/playlists/${playlistId}/items?limit=${limit}&offset=${offset}`)
   );
 
   // Filter out null tracks (can happen with local files or removed tracks)

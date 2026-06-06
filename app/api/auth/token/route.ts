@@ -4,46 +4,34 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    console.log('Token endpoint called');
-    const cookieStore = cookies();
-    
-    // Log all cookies for debugging
-    const allCookies = cookieStore.getAll();
-    console.log('All cookies:', allCookies.map(c => c.name));
-    
-    const accessToken = cookieStore.get('spotify_access_token')?.value;
-    const refreshToken = cookieStore.get('spotify_refresh_token')?.value;
-    const expiresAt = cookieStore.get('spotify_token_expires_at')?.value;
+  console.log('Token endpoint called');
+  console.log('Request origin:', request.nextUrl.origin);
+  console.log(
+    'Incoming cookies:',
+    request.cookies.getAll().map(c => c.name)
+  );
 
-    console.log('Access token found:', !!accessToken);
-    console.log('Refresh token found:', !!refreshToken);
-    console.log('Expires at found:', !!expiresAt);
+  const accessToken = request.cookies.get('spotify_access_token')?.value;
+  const refreshToken = request.cookies.get('spotify_refresh_token')?.value;
+  const expiresAt = request.cookies.get('spotify_token_expires_at')?.value;
 
-    if (!accessToken) {
-      console.log('No access token in cookies, returning 401');
-      return NextResponse.json(
-        { error: 'No access token found' },
-        { status: 401 }
-      );
-    }
+  if (!accessToken) {
+    return NextResponse.json(
+      { error: 'No access token found' },
+      { status: 401, headers: { 'Cache-Control': 'no-store' } }
+    );
+  }
 
-    console.log('Returning tokens to client');
-    return NextResponse.json({
+  return NextResponse.json(
+    {
       access_token: accessToken,
       refresh_token: refreshToken,
       expires_at: expiresAt ? parseInt(expiresAt) : null,
-    });
-  } catch (error) {
-    console.error('Error retrieving token:', error);
-    return NextResponse.json(
-      { error: 'Failed to retrieve token' },
-      { status: 500 }
-    );
-  }
+    },
+    { headers: { 'Cache-Control': 'no-store' } }
+  );
 }
-
-// Made with Bob

@@ -81,11 +81,41 @@ function clearCodeVerifier(): void {
 }
 
 /**
+ * If the current page origin doesn't match the configured Spotify redirect URI's
+ * origin (e.g. user is on http://localhost:3000 but the redirect URI is
+ * http://127.0.0.1:3000), navigate to the matching origin first. Otherwise
+ * cookies set during the OAuth callback won't be visible on subsequent fetches.
+ *
+ * Returns true if a redirect was triggered (caller should stop).
+ */
+export function ensureMatchingOrigin(): boolean {
+  if (typeof window === 'undefined') return false;
+  const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
+  if (!redirectUri) return false;
+
+  let expectedOrigin: string;
+  try {
+    expectedOrigin = new URL(redirectUri).origin;
+  } catch {
+    return false;
+  }
+
+  if (window.location.origin === expectedOrigin) return false;
+
+  const target = new URL(window.location.pathname + window.location.search + window.location.hash, expectedOrigin);
+  window.location.replace(target.toString());
+  return true;
+}
+
+/**
  * Initiate Spotify authentication flow
  * Redirects user to Spotify authorization page
  * @param testMode - If true, adds test=true to callback redirect
  */
 export async function initiateSpotifyAuth(testMode: boolean = false): Promise<void> {
+  // Bounce to the redirect URI's origin first if we aren't already on it.
+  if (ensureMatchingOrigin()) return;
+
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
 
@@ -297,6 +327,7 @@ export async function getValidAccessToken(): Promise<string> {
     // Fetch token from server-side cookies via API route
     const response = await fetch('/api/auth/token', {
       credentials: 'include', // Include cookies in request
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -318,6 +349,7 @@ export async function getValidAccessToken(): Promise<string> {
         const refreshResponse = await fetch('/api/auth/refresh', {
           method: 'POST',
           credentials: 'include',
+          cache: 'no-store',
         });
         
         if (!refreshResponse.ok) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { initiateSpotifyAuth, getValidAccessToken } from '@/lib/spotify/auth';
+import { initiateSpotifyAuth, getValidAccessToken, ensureMatchingOrigin } from '@/lib/spotify/auth';
 import { getUserProfile, getAllUserPlaylists } from '@/lib/spotify/api';
 import type { SpotifyUser, SpotifyPlaylist } from '@/lib/types';
 
@@ -13,6 +13,13 @@ export default function TestSpotifyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState(false);
+
+  // Make sure this tab is on the same origin as the Spotify redirect URI.
+  // If not, bounce to it before doing anything else — otherwise cookies set
+  // by the OAuth callback won't be visible to /api/auth/token from this tab.
+  useEffect(() => {
+    ensureMatchingOrigin();
+  }, []);
 
   // Check if we just returned from successful auth and auto-fetch data
   useEffect(() => {
