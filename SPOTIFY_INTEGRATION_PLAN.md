@@ -1,586 +1,500 @@
-# Spotify Integration Plan
+# Spotify Integration Action Plan
 
 ## Overview
-This document outlines the complete action plan for integrating Spotify API into the vinyl creation application. The integration will allow users to authenticate with Spotify, select playlists, and automatically populate vinyl details with real playlist data.
+This document outlines the complete action plan for integrating Spotify API into the vinyl creation application. The integration expands the original 4-step flow to a 7-step flow that includes Spotify authentication, playlist selection, and automatic population of vinyl details with real Spotify data.
 
 ---
 
-## Current Application Flow
-**Existing Steps:**
-1. **Step 1**: Enter vinyl details (name, playlist name)
-2. **Step 2**: Design vinyl cover (upload image)
-3. **Step 3**: Add decorative stickers
-4. **Step 4**: View final vinyl and share
+## Flow Transformation
+
+### Original Flow (4 Steps)
+1. **Step 1**: Enter vinyl details (artist name, album name)
+2. **Step 2**: Decorate vinyl cover
+3. **Step 3**: Add stickers to vinyl case
+4. **Step 4**: Share vinyl
+
+### New Flow (7 Steps)
+1. **Step 1**: Enter vinyl details (artist name, album name) - *unchanged*
+2. **Step 2 (NEW)**: Spotify Authentication
+   - User logs into their Spotify account
+   - Application requests access to profile and playlists
+3. **Step 3 (NEW)**: Playlist Selection
+   - Display user's playlists in a grid/list
+   - User selects which playlist to create as vinyl
+4. **Step 4 (MODIFIED)**: Enter vinyl details
+   - Pre-filled with Spotify user's name and playlist name
+   - Playlist name truncated to 8 characters if longer
+   - User can edit both fields
+5. **Step 5**: Decorate vinyl cover - *same as old Step 2*
+   - Track list now shows real tracks from selected playlist (first 12 songs)
+6. **Step 6**: Add stickers to vinyl case - *same as old Step 3*
+7. **Step 7 (MODIFIED)**: Share vinyl
+   - Added "Open in Spotify" button above share link
+   - Links directly to the selected playlist
 
 ---
 
-## New Application Flow with Spotify Integration
+## Implementation Phases
 
-### Step 1: Landing/Welcome (Unchanged)
-- User starts the vinyl creation process
+### Phase 1: Setup & Authentication ✅ (In Progress - Debugging)
+**Status**: Backend infrastructure complete, debugging cookie issue
 
-### Step 2: Spotify Authentication (NEW)
-- **Purpose**: Authenticate user with Spotify and fetch their profile
-- **UI Components**:
-  - Same background and styling as other steps
-  - "Connect to Spotify" button with Spotify branding
-  - Loading state during authentication
-  - Success message with user's Spotify profile name
-- **Data Retrieved**:
-  - User profile (display name, user ID)
-  - User's playlists
+#### Task 1: Setup Spotify Developer Account ✅
+- [x] Register application at https://developer.spotify.com/dashboard
+- [x] Configure redirect URI: `http://127.0.0.1:3000/api/auth/callback`
+- [x] Note Client ID for environment variables
 
-### Step 3: Playlist Selection (NEW)
-- **Purpose**: Display user's playlists and allow selection
-- **UI Components**:
-  - Grid/list view of user's playlists
-  - Each playlist shows: name, image, track count
-  - Selection mechanism (radio buttons or cards)
-  - Search/filter functionality for users with many playlists
-- **Data Retrieved**:
-  - Selected playlist details
-  - Playlist tracks (first 12 tracks)
-
-### Step 4: Enter Vinyl Details (MODIFIED - Previously Step 2)
-- **Purpose**: Confirm/edit vinyl details with pre-filled Spotify data
-- **Changes**:
-  - **Pre-filled fields**:
-    - Name: User's Spotify display name
-    - Playlist Name: Selected playlist name (truncated to 8 characters if longer)
-  - **Editable**: User can modify both fields
-  - **Playlist name truncation logic**: If playlist name > 8 chars, truncate and add "..."
-
-### Step 5: Design Vinyl Cover (Previously Step 3)
-- **Purpose**: Upload cover image
-- **Changes**: None to functionality, just step number update
-
-### Step 6: Add Stickers (Previously Step 4)
-- **Purpose**: Decorate vinyl case
-- **Changes**:
-  - **Track list on cover**: Replace mock data (song1, song2, etc.) with actual track names from selected Spotify playlist
-  - **Display**: First 12 tracks from playlist
-  - **Format**: Side A (tracks 1-6), Side B (tracks 7-12)
-
-### Step 7: Final View & Share (Previously Step 5)
-- **Purpose**: View completed vinyl and share
-- **Changes**:
-  - **New button**: "Open in Spotify" - Direct link to the original Spotify playlist
-  - **Position**: Above the share vinyl link
-  - **Functionality**: Opens Spotify playlist in new tab/Spotify app
-
----
-
-## Technical Implementation Plan
-
-### 1. Environment Setup
-**Files to create/modify:**
-- `.env.local` - Store Spotify credentials
+#### Task 2: Configure Environment Variables ✅
+- [x] Create/update `.env.local` with:
   ```
   NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your_client_id
-  SPOTIFY_CLIENT_SECRET=your_client_secret
   NEXT_PUBLIC_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback
   ```
 
-**Required values:**
-- Spotify Client ID (from Spotify Developer Dashboard)
-- Spotify Client Secret (from Spotify Developer Dashboard)
-- Redirect URI (must match Spotify app settings)
+#### Task 3: Create Authentication Module ✅
+- [x] Create `lib/spotify/auth.ts`
+- [x] Implement PKCE flow functions:
+  - `generateCodeVerifier()` - Generate random string
+  - `generateCodeChallenge()` - SHA-256 hash of verifier
+  - `initiateSpotifyAuth(testMode)` - Start OAuth flow with state parameter
+  - `exchangeCodeForToken()` - Exchange code for tokens
+  - `getValidAccessToken()` - Fetch token from API endpoint with auto-refresh
+  - `refreshAccessToken()` - Refresh expired tokens
+  - `clearTokens()` - Clear authentication state
 
-### 2. Spotify Authentication Service
-**File to create:** `lib/spotify/auth.ts`
+#### Task 4: Create API Service ✅
+- [x] Create `lib/spotify/api.ts`
+- [x] Implement API functions:
+  - `getUserProfile()` - Get user's Spotify profile
+  - `getAllUserPlaylists()` - Fetch all playlists with pagination
+  - `getVinylTrackList(playlistId)` - Get exactly 12 formatted tracks
+  - `formatTrackForVinyl(track)` - Format as "Artist - Track Name"
+- [x] Implement error handling with `SpotifyAPIError` class
+- [x] Add rate limiting support (429 handling with Retry-After)
 
-**Responsibilities:**
-- Generate PKCE code verifier and challenge
-- Build authorization URL with required scopes
-- Handle authorization code exchange for access token
-- Implement token refresh logic
-- Store tokens securely (sessionStorage/localStorage)
+#### Task 5: Add Type Definitions ✅
+- [x] Update `lib/types.ts` with:
+  - `SpotifyUser` interface
+  - `SpotifyPlaylist` interface
+  - `SpotifyTrack` interface
+  - `SpotifyTokens` interface
+- [x] Update `VinylData` interface with optional Spotify fields:
+  - `spotifyPlaylistId?: string`
+  - `spotifyPlaylistName?: string`
+  - `spotifyUserId?: string`
+  - `spotifyUserName?: string`
 
-**Required Scopes:**
-- `user-read-private` - Read user profile
-- `user-read-email` - Read user email
-- `playlist-read-private` - Read private playlists
-- `playlist-read-collaborative` - Read collaborative playlists
+#### Task 6: Create OAuth Callback Route ✅
+- [x] Create `app/api/auth/callback/route.ts`
+- [x] Extract code verifier from state parameter
+- [x] Exchange authorization code for tokens
+- [x] Store tokens in HTTP-only cookies
+- [x] Support test mode flag in state parameter
+- [x] Redirect to appropriate page based on mode
 
-**Authentication Flow:**
-- Use Authorization Code with PKCE flow (recommended for client-side apps)
-- Reference: https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
+#### Task 7: Create Token Refresh Route ✅
+- [x] Create `app/api/auth/refresh/route.ts`
+- [x] Read refresh token from HTTP-only cookie
+- [x] Call Spotify token refresh endpoint
+- [x] Update cookies with new tokens
+- [x] Return new access token to client
 
-### 3. Spotify API Service
-**File to create:** `lib/spotify/api.ts`
+#### Task 8: Create Token Retrieval Route ✅
+- [x] Create `app/api/auth/token/route.ts`
+- [x] Read tokens from HTTP-only cookies
+- [x] Return tokens to client-side code
+- [x] Handle missing token cases
+- [x] Add comprehensive logging for debugging
 
-**Functions to implement:**
-```typescript
-// Get current user profile
-getUserProfile(accessToken: string): Promise<SpotifyUser>
+#### Task 9: Test Authentication Flow ⏳ (In Progress)
+- [x] Create test page at `/test-spotify`
+- [x] Test login flow with test mode
+- [x] Verify token storage in cookies
+- [ ] **DEBUG**: Fix cookie reading issue in token endpoint
+- [ ] Verify profile retrieval works
+- [ ] Verify playlist retrieval works
+- [ ] Test token refresh mechanism
 
-// Get user's playlists (paginated)
-getUserPlaylists(accessToken: string, limit?: number, offset?: number): Promise<SpotifyPlaylist[]>
+**Current Issue**: Cookies are being set in callback but not readable in token endpoint. Added logging to debug.
 
-// Get playlist details including tracks
-getPlaylistTracks(accessToken: string, playlistId: string): Promise<SpotifyTrack[]>
+---
 
-// Refresh access token
-refreshAccessToken(refreshToken: string): Promise<TokenResponse>
-```
+### Phase 2: State Management (Pending)
 
-**API Endpoints to use:**
-- `GET /v1/me` - User profile
-- `GET /v1/me/playlists` - User playlists
-- `GET /v1/playlists/{playlist_id}/tracks` - Playlist tracks
-
-**Error Handling:**
-- Handle 401 (unauthorized) - trigger token refresh
-- Handle 429 (rate limit) - implement exponential backoff
-- Handle network errors gracefully
-
-### 4. Type Definitions
-**File to modify:** `lib/types.ts`
-
-**New types to add:**
-```typescript
-// Spotify user profile
-export interface SpotifyUser {
-  id: string
-  display_name: string
-  email?: string
-  images?: Array<{ url: string }>
-}
-
-// Spotify playlist
-export interface SpotifyPlaylist {
-  id: string
-  name: string
-  description?: string
-  images: Array<{ url: string }>
-  tracks: {
-    total: number
-  }
-  owner: {
-    display_name: string
-  }
-}
-
-// Spotify track
-export interface SpotifyTrack {
-  id: string
-  name: string
-  artists: Array<{ name: string }>
-  album: {
-    name: string
-    images: Array<{ url: string }>
-  }
-  duration_ms: number
-}
-
-// Spotify auth tokens
-export interface SpotifyTokens {
-  access_token: string
-  refresh_token?: string
-  expires_in: number
-  token_type: string
-}
-```
-
-**Modify existing VinylData interface:**
-```typescript
-export interface VinylData {
-  id: string
-  name: string
-  playlistName: string
-  coverImageUrl: string | null
-  stickers: StickerPlacement[]
-  tracks: string[]
-  createdAt: string
-  // NEW FIELDS:
-  spotifyPlaylistId?: string  // Link to original Spotify playlist
-  spotifyUserId?: string      // User who created it
-}
-```
-
-### 5. State Management
-**File to modify:** `lib/vinylStore.ts`
-
-**New state fields:**
-```typescript
-interface VinylStore {
-  // Existing fields...
-  name: string
-  playlistName: string
-  coverImageFile: File | null
-  coverImagePreviewUrl: string | null
-  stickers: StickerPlacement[]
-  tracks: string[]
-  vinylId: string | null
-  
-  // NEW SPOTIFY FIELDS:
-  spotifyAccessToken: string | null
-  spotifyRefreshToken: string | null
+#### Task 10: Update Vinyl Store
+- [ ] Update `lib/vinylStore.ts` with Spotify state:
+  ```typescript
   spotifyUser: SpotifyUser | null
-  spotifyPlaylists: SpotifyPlaylist[]
   selectedPlaylist: SpotifyPlaylist | null
-  spotifyPlaylistId: string | null
-  
-  // NEW ACTIONS:
-  setSpotifyTokens: (access: string, refresh?: string) => void
-  setSpotifyUser: (user: SpotifyUser) => void
-  setSpotifyPlaylists: (playlists: SpotifyPlaylist[]) => void
-  setSelectedPlaylist: (playlist: SpotifyPlaylist) => void
-  setTracks: (tracks: string[]) => void
-  clearSpotifyData: () => void
-}
-```
+  isSpotifyAuthenticated: boolean
+  spotifyError: string | null
+  ```
 
-**Track handling logic:**
-- When playlist is selected, extract first 12 track names
-- Format: "Artist Name - Track Name"
-- Store in `tracks` array
-- Ensure exactly 12 tracks (pad with empty if needed)
+#### Task 11: Add Spotify Actions
+- [ ] `setSpotifyUser(user: SpotifyUser)`
+- [ ] `setSelectedPlaylist(playlist: SpotifyPlaylist)`
+- [ ] `clearSpotifyData()`
+- [ ] `setSpotifyError(error: string)`
 
-### 6. API Routes
-**Files to create:**
+#### Task 12: Implement Token Management
+- [ ] Add token refresh logic to store
+- [ ] Handle token expiration gracefully
+- [ ] Clear tokens on logout
 
-#### `app/api/auth/callback/route.ts`
-- Handle OAuth callback from Spotify
-- Exchange authorization code for access token
-- Store tokens securely
-- Redirect to create page
+---
 
-#### `app/api/auth/refresh/route.ts`
-- Handle token refresh requests
-- Exchange refresh token for new access token
-- Return new tokens to client
+### Phase 3: UI Components (Pending)
 
-### 7. New Step Components
+#### Task 13: Create Spotify Authentication Component
+- [ ] Create `components/steps/SpotifyAuth.tsx`
+- [ ] Design matching background and style from other steps
+- [ ] Add "Connect to Spotify" button
+- [ ] Show loading state during authentication
+- [ ] Display error messages if authentication fails
+- [ ] Show success message and user info after login
 
-#### **File to create:** `components/steps/SpotifyAuth.tsx`
-**Props:**
-```typescript
-interface Props {
-  onBack: () => void
-  onNext: () => void
-}
-```
-
-**Features:**
-- "Connect to Spotify" button with Spotify green branding
-- Loading spinner during authentication
-- Error handling and retry mechanism
-- Display user profile after successful auth
-- Automatic progression to next step after auth
-
-**UI Elements:**
-- Spotify logo/branding
-- Clear explanation of what data will be accessed
-- Privacy notice
-- Same paper texture background as other steps
-
-#### **File to create:** `components/steps/PlaylistSelection.tsx`
-**Props:**
-```typescript
-interface Props {
-  onBack: () => void
-  onNext: () => void
-}
-```
-
-**Features:**
-- Grid layout of playlist cards
-- Each card shows:
+#### Task 14: Create Playlist Selection Component
+- [ ] Create `components/steps/PlaylistSelection.tsx`
+- [ ] Fetch user's playlists on mount
+- [ ] Display playlists in grid layout with:
   - Playlist cover image
   - Playlist name
   - Track count
-  - Owner name
-- Search/filter input
-- Pagination for users with many playlists
-- Loading states
-- Empty state if no playlists found
-- Selected state highlighting
+  - Creator name
+- [ ] Add search/filter functionality
+- [ ] Handle empty playlist state
+- [ ] Show loading skeleton while fetching
+- [ ] Highlight selected playlist
+- [ ] Add "Continue" button (disabled until selection)
 
-**UI Elements:**
-- Responsive grid (1-3 columns based on screen size)
-- Hover effects on playlist cards
-- Selected playlist highlighted with border/background
-- "Continue" button enabled only when playlist selected
+#### Task 15: Add Playlist Grid Styling
+- [ ] Match vinyl app aesthetic
+- [ ] Responsive grid (1 col mobile, 2-3 cols tablet, 3-4 cols desktop)
+- [ ] Hover effects on playlist cards
+- [ ] Selected state styling
+- [ ] Loading states with skeleton screens
 
-#### **File to modify:** `components/steps/Step1Form.tsx`
-**Changes:**
-- Pre-fill name field with Spotify user's display name
-- Pre-fill playlist name with selected playlist name
-- Implement 8-character truncation for playlist name
-- Keep fields editable
-- Add visual indicator that data is from Spotify (optional)
+---
 
-### 8. Component Updates
+### Phase 4: Modify Existing Steps (Pending)
 
-#### **File to modify:** `components/vinyl/VinylCover.tsx`
-**Changes:**
-- Already displays tracks array from props
-- No code changes needed
-- Will automatically show real track names when tracks array is updated
-
-#### **File to modify:** `components/steps/Step4Final.tsx`
-**Changes:**
-- Add "Open in Spotify" button
-- Position above share link
-- Button styling: Spotify green (#1DB954)
-- Opens playlist URL: `https://open.spotify.com/playlist/{playlistId}`
-- Handle case where spotifyPlaylistId is null (hide button)
-
-### 9. Page Flow Updates
-
-#### **File to modify:** `app/create/page.tsx`
-**Changes:**
-- Update step count from 4 to 7
-- Add new step components:
+#### Task 16: Update Step 1 Form (Now Step 4)
+- [ ] Modify `components/steps/Step1Form.tsx`
+- [ ] Pre-fill artist name with Spotify user's name
+- [ ] Pre-fill album name with playlist name (truncated to 8 chars)
+- [ ] Implement truncation logic:
   ```typescript
-  {step === 1 && <Step1Form onBack={() => router.push('/')} onNext={() => setStep(2)} />}
-  {step === 2 && <SpotifyAuth onBack={() => setStep(1)} onNext={() => setStep(3)} />}
-  {step === 3 && <PlaylistSelection onBack={() => setStep(2)} onNext={() => setStep(4)} />}
-  {step === 4 && <Step1Form onBack={() => setStep(3)} onNext={() => setStep(5)} />}
-  {step === 5 && <Step2Cover onBack={() => setStep(4)} onNext={() => setStep(6)} />}
-  {step === 6 && <Step3Stickers onBack={() => setStep(5)} onNext={() => setStep(7)} />}
-  {step === 7 && <Step4Final />}
+  const truncatePlaylistName = (name: string): string => {
+    return name.length > 8 ? name.substring(0, 8) : name;
+  }
   ```
+- [ ] Keep fields editable
+- [ ] Show "(from Spotify)" indicator for pre-filled fields
 
-#### **File to modify:** `components/ui/StepIndicator.tsx`
-**Changes:**
-- Update total steps from 4 to 7
-- Update step labels:
-  1. "Start"
+#### Task 17: Update Final Step (Now Step 7)
+- [ ] Modify `components/steps/Step4Final.tsx`
+- [ ] Add "Open in Spotify" button above share link
+- [ ] Button should link to: `https://open.spotify.com/playlist/${playlistId}`
+- [ ] Style button to match app theme
+- [ ] Only show if vinyl was created from Spotify playlist
+
+#### Task 18: Update Vinyl Cover Component
+- [ ] Modify `components/vinyl/VinylCover.tsx`
+- [ ] Replace mock track list with real tracks
+- [ ] Display first 12 tracks from selected playlist
+- [ ] Format tracks as "Artist - Track Name"
+- [ ] Handle playlists with fewer than 12 tracks
+- [ ] Maintain existing styling and layout
+
+---
+
+### Phase 5: Update Main Flow (Pending)
+
+#### Task 19: Update Create Page
+- [ ] Modify `app/create/page.tsx`
+- [ ] Update step routing to support 7 steps
+- [ ] Add step 2 (SpotifyAuth) route
+- [ ] Add step 3 (PlaylistSelection) route
+- [ ] Adjust step numbers for existing components
+- [ ] Update navigation logic between steps
+
+#### Task 20: Update Step Indicator
+- [ ] Modify `components/ui/StepIndicator.tsx`
+- [ ] Update step labels:
+  1. "Details"
   2. "Connect Spotify"
   3. "Select Playlist"
-  4. "Vinyl Details"
-  5. "Cover Design"
-  6. "Decorate"
+  4. "Edit Details"
+  5. "Design Cover"
+  6. "Add Stickers"
   7. "Share"
+- [ ] Adjust styling for 7 steps
+- [ ] Ensure responsive layout
 
-### 10. Database Schema Updates
+---
 
-#### **File to modify:** `lib/vinylService.ts`
-**Changes:**
-- Update `saveVinyl` function to include Spotify fields
-- Store `spotifyPlaylistId` and `spotifyUserId` in Firestore
-- Update `getVinyl` function to retrieve Spotify fields
+### Phase 6: Track List Integration (Pending)
 
-**Firestore document structure:**
-```typescript
-{
-  id: string
-  name: string
-  playlistName: string
-  coverImageUrl: string
-  stickers: StickerPlacement[]
-  tracks: string[]  // Now contains real track names
-  createdAt: Timestamp
-  spotifyPlaylistId?: string
-  spotifyUserId?: string
-}
+#### Task 21: Implement Track Extraction
+- [ ] Create utility function to extract tracks from playlist
+- [ ] Ensure exactly 12 tracks are selected (first 12)
+- [ ] Format tracks for vinyl cover display
+- [ ] Handle edge cases:
+  - Playlists with < 12 tracks (repeat or show available)
+  - Playlists with no tracks (show error)
+  - Very long track/artist names (truncate)
+
+#### Task 22: Update Vinyl Data Storage
+- [ ] Store track list in vinyl data
+- [ ] Include Spotify playlist ID for reference
+- [ ] Save formatted track strings
+- [ ] Ensure data persists through all steps
+
+---
+
+### Phase 7: Database & Persistence (Pending)
+
+#### Task 23: Update Vinyl Service
+- [ ] Modify `lib/vinylService.ts`
+- [ ] Update `saveVinyl()` to include Spotify fields
+- [ ] Update `getVinyl()` to retrieve Spotify data
+- [ ] Ensure Firebase schema supports new fields
+
+#### Task 24: Test Data Persistence
+- [ ] Create vinyl with Spotify data
+- [ ] Verify data saves to Firebase
+- [ ] Retrieve vinyl and verify Spotify data intact
+- [ ] Test vinyl sharing with Spotify link
+
+---
+
+### Phase 8: Error Handling & Edge Cases (Pending)
+
+#### Task 25: Implement Comprehensive Error Handling
+- [ ] Handle authentication failures gracefully
+- [ ] Show user-friendly error messages
+- [ ] Provide retry mechanisms
+- [ ] Handle network errors
+- [ ] Handle API rate limiting (429 responses)
+- [ ] Implement exponential backoff
+
+#### Task 26: Handle Edge Cases
+- [ ] User has no playlists → Show empty state with instructions
+- [ ] Playlist has no tracks → Show error, prevent selection
+- [ ] Playlist has < 12 tracks → Show warning, allow selection
+- [ ] Token expires during flow → Auto-refresh transparently
+- [ ] User cancels Spotify auth → Return to previous step
+- [ ] Spotify API is down → Show maintenance message
+
+#### Task 27: Add Loading States
+- [ ] Loading spinner during authentication
+- [ ] Skeleton screens while fetching playlists
+- [ ] Loading indicator while fetching tracks
+- [ ] Disable buttons during async operations
+
+---
+
+### Phase 9: Testing & Polish (Pending)
+
+#### Task 28: End-to-End Testing
+- [ ] Test complete flow from start to finish
+- [ ] Test with multiple Spotify accounts
+- [ ] Test with various playlist sizes
+- [ ] Test token refresh during long sessions
+- [ ] Test error recovery flows
+- [ ] Test on different browsers
+
+#### Task 29: Mobile Responsiveness
+- [ ] Test all new components on mobile
+- [ ] Verify playlist grid is responsive
+- [ ] Test authentication flow on mobile
+- [ ] Ensure buttons are touch-friendly
+
+#### Task 30: Accessibility
+- [ ] Add proper ARIA labels
+- [ ] Ensure keyboard navigation works
+- [ ] Test with screen readers
+- [ ] Verify color contrast ratios
+- [ ] Add focus indicators
+
+---
+
+### Phase 10: Documentation (Pending)
+
+#### Task 31: Update README
+- [ ] Add Spotify integration section
+- [ ] Document environment variables
+- [ ] Add setup instructions for Spotify Developer account
+- [ ] Include screenshots of new steps
+- [ ] Document required Spotify scopes
+
+#### Task 32: Create Troubleshooting Guide
+- [ ] Common authentication issues
+- [ ] Token refresh problems
+- [ ] API rate limiting
+- [ ] Playlist selection issues
+- [ ] Contact information for support
+
+---
+
+## Technical Specifications
+
+### Spotify API Endpoints Used
+1. **Authorization**: `https://accounts.spotify.com/authorize`
+2. **Token Exchange**: `https://accounts.spotify.com/api/token`
+3. **User Profile**: `GET https://api.spotify.com/v1/me`
+4. **User Playlists**: `GET https://api.spotify.com/v1/me/playlists`
+5. **Playlist Tracks**: `GET https://api.spotify.com/v1/playlists/{id}/tracks`
+
+### Required Scopes
+- `user-read-private` - Access user profile
+- `user-read-email` - Access user email
+- `playlist-read-private` - Access private playlists
+- `playlist-read-collaborative` - Access collaborative playlists
+
+### Authentication Flow (PKCE)
+1. Generate code verifier (random string)
+2. Generate code challenge (SHA-256 hash of verifier)
+3. Redirect to Spotify authorization with challenge
+4. User approves access
+5. Spotify redirects back with authorization code
+6. Exchange code + verifier for access token
+7. Store tokens in HTTP-only cookies
+8. Use access token for API requests
+9. Refresh token when expired
+
+### Security Considerations
+- ✅ Use PKCE flow (no client secret exposure)
+- ✅ Store tokens in HTTP-only cookies (not localStorage)
+- ✅ Use HTTPS in production
+- ✅ Implement token refresh before expiration
+- ✅ Handle rate limiting with exponential backoff
+- ✅ Validate redirect URIs
+- ✅ Request minimum required scopes
+
+---
+
+## File Structure
+
+```
+lib/
+├── spotify/
+│   ├── auth.ts          ✅ Authentication logic (PKCE flow)
+│   └── api.ts           ✅ Spotify API service functions
+├── types.ts             ✅ Updated with Spotify types
+├── vinylStore.ts        ⏳ To be updated with Spotify state
+└── vinylService.ts      ⏳ To be updated for Spotify data
+
+app/
+├── api/
+│   └── auth/
+│       ├── callback/
+│       │   └── route.ts ✅ OAuth callback handler
+│       ├── refresh/
+│       │   └── route.ts ✅ Token refresh endpoint
+│       └── token/
+│           └── route.ts ✅ Token retrieval endpoint
+├── test-spotify/
+│   └── page.tsx         ✅ Test page for authentication
+└── create/
+    └── page.tsx         ⏳ To be updated for 7-step flow
+
+components/
+├── steps/
+│   ├── SpotifyAuth.tsx        ⏳ To be created
+│   ├── PlaylistSelection.tsx  ⏳ To be created
+│   ├── Step1Form.tsx          ⏳ To be updated (pre-fill)
+│   └── Step4Final.tsx         ⏳ To be updated (Spotify button)
+├── vinyl/
+│   └── VinylCover.tsx         ⏳ To be updated (real tracks)
+└── ui/
+    └── StepIndicator.tsx      ⏳ To be updated (7 steps)
 ```
 
 ---
 
-## Implementation Checklist
+## Current Status
 
-### ⚠️ IMPORTANT: Testing Protocol
-**After completing each phase, STOP and wait for user testing before proceeding to the next phase.**
+### ✅ Completed
+- Spotify Developer account setup
+- Environment configuration
+- Authentication module with PKCE flow
+- API service with error handling
+- Type definitions
+- OAuth callback route with cookie storage
+- Token refresh route
+- Token retrieval route
+- Test page for authentication
 
-The implementation will follow this workflow:
-1. Complete all tasks in a phase
-2. **STOP** - Wait for user to test on localhost:3000
-3. User will report test results
-4. Fix any issues found during testing
-5. Only proceed to next phase after user confirms everything works
+### ⏳ In Progress
+- **Debugging cookie issue**: Tokens are being set in callback but not readable in token endpoint
+- Added comprehensive logging to identify the issue
 
-This ensures each component is verified before building on top of it.
-
----
-
-### Phase 1: Setup & Authentication
-- [ ] Register app in Spotify Developer Dashboard
-- [ ] Configure redirect URIs in Spotify app settings
-- [ ] Add environment variables to `.env.local`
-- [ ] Create `lib/spotify/auth.ts` with PKCE flow
-- [ ] Create `lib/spotify/api.ts` with API functions
-- [ ] Add Spotify types to `lib/types.ts`
-- [ ] Create API routes for OAuth callback and token refresh
-- [ ] Test authentication flow end-to-end
-- [ ] **🛑 STOP - Wait for user testing on localhost:3000**
-
-### Phase 2: State Management
-- [ ] Update `lib/vinylStore.ts` with Spotify fields
-- [ ] Add Spotify-related actions to store
-- [ ] Implement token storage and retrieval
-- [ ] Add token refresh logic
-- [ ] Test state persistence across page reloads
-- [ ] **🛑 STOP - Wait for user testing on localhost:3000**
-
-### Phase 3: New Step Components
-- [ ] Create `components/steps/SpotifyAuth.tsx`
-- [ ] Implement Spotify login button and flow
-- [ ] Add loading and error states
-- [ ] **🛑 STOP - Wait for user testing of SpotifyAuth component on localhost:3000**
-- [ ] Create `components/steps/PlaylistSelection.tsx`
-- [ ] Implement playlist grid/list view
-- [ ] Add search/filter functionality
-- [ ] Implement playlist selection logic
-- [ ] Test both components with real Spotify data
-- [ ] **🛑 STOP - Wait for user testing of PlaylistSelection component on localhost:3000**
-
-### Phase 4: Modify Existing Components
-- [ ] Update `components/steps/Step1Form.tsx` for pre-filled data
-- [ ] Implement 8-character truncation for playlist names
-- [ ] **🛑 STOP - Wait for user testing of Step1Form modifications on localhost:3000**
-- [ ] Update `components/steps/Step4Final.tsx` with Spotify button
-- [ ] Style "Open in Spotify" button
-- [ ] Test pre-filled data flow
-- [ ] **🛑 STOP - Wait for user testing of Step4Final modifications on localhost:3000**
-
-### Phase 5: Update Application Flow
-- [ ] Modify `app/create/page.tsx` for 7-step flow
-- [ ] Update `components/ui/StepIndicator.tsx` labels
-- [ ] Update step navigation logic
-- [ ] Test complete flow from start to finish
-- [ ] **🛑 STOP - Wait for user testing of complete 7-step flow on localhost:3000**
-
-### Phase 6: Track Integration
-- [ ] Update track extraction logic in playlist selection
-- [ ] Format tracks as "Artist - Song Name"
-- [ ] Ensure exactly 12 tracks are stored
-- [ ] Verify tracks display correctly on vinyl cover
-- [ ] Test with playlists of various sizes
-- [ ] **🛑 STOP - Wait for user testing of track display on localhost:3000**
-
-### Phase 7: Database & Persistence
-- [ ] Update `lib/vinylService.ts` to save Spotify fields
-- [ ] Test saving vinyl with Spotify data
-- [ ] Test retrieving vinyl with Spotify data
-- [ ] Verify Spotify playlist link works on shared vinyls
-- [ ] **🛑 STOP - Wait for user testing of database persistence on localhost:3000**
-
-### Phase 8: Error Handling & Edge Cases
-- [ ] Handle authentication failures
-- [ ] Handle token expiration and refresh
-- [ ] Handle API rate limiting (429 errors)
-- [ ] Handle users with no playlists
-- [ ] Handle playlists with < 12 tracks
-- [ ] Handle network errors gracefully
-- [ ] Add user-friendly error messages
-- [ ] **🛑 STOP - Wait for user testing of error scenarios on localhost:3000**
-
-### Phase 9: Testing & Polish
-- [ ] Test with various Spotify accounts
-- [ ] Test with different playlist sizes
-- [ ] Test token refresh flow
-- [ ] Test error recovery
-- [ ] Verify mobile responsiveness
-- [ ] Check accessibility
-- [ ] Performance optimization
-- [ ] Add loading skeletons where appropriate
-- [ ] **🛑 STOP - Wait for user final testing and approval on localhost:3000**
-
-### Phase 10: Documentation
-- [ ] Update README with Spotify setup instructions
-- [ ] Document environment variables
-- [ ] Add troubleshooting guide
-- [ ] Document API rate limits and handling
-- [ ] Add user guide for Spotify features
-- [ ] **✅ COMPLETE - All phases tested and approved**
+### ⏳ Next Steps
+1. Fix cookie reading issue in token endpoint
+2. Complete authentication flow testing
+3. Begin Phase 2: State Management
+4. Create UI components for Spotify steps
 
 ---
 
-## Security Considerations
+## Testing Checklist
 
-1. **Token Storage**
-   - Store access tokens in sessionStorage (cleared on tab close)
-   - Never expose client secret in client-side code
-   - Implement token refresh before expiration
+### Authentication Testing
+- [x] Login redirects to Spotify
+- [x] User can approve access
+- [x] Callback receives authorization code
+- [x] Tokens are exchanged successfully
+- [x] Tokens stored in HTTP-only cookies
+- [ ] **DEBUG**: Token endpoint can read cookies
+- [ ] Profile data can be fetched
+- [ ] Playlists can be fetched
+- [ ] Token refresh works automatically
+- [ ] Logout clears all tokens
 
-2. **API Security**
-   - Use HTTPS for all API calls
-   - Validate redirect URIs match registered URIs
-   - Implement CSRF protection in OAuth flow
+### Integration Testing
+- [ ] Complete 7-step flow works end-to-end
+- [ ] Vinyl details pre-fill correctly
+- [ ] Playlist name truncates to 8 characters
+- [ ] Real tracks appear on vinyl cover
+- [ ] "Open in Spotify" button works
+- [ ] Vinyl saves with Spotify data
+- [ ] Shared vinyl includes Spotify link
 
-3. **Data Privacy**
-   - Request minimum required scopes
-   - Clear explanation of data usage to users
-   - Comply with Spotify Developer Terms of Service
-   - Don't cache Spotify content beyond immediate use
-
-4. **Error Handling**
-   - Don't expose sensitive error details to users
-   - Log errors securely for debugging
-   - Implement rate limiting on client side
-
----
-
-## Spotify Developer Terms Compliance
-
-1. **Attribution**
-   - Display Spotify branding on authentication button
-   - Attribute playlist data to Spotify
-   - Include "Powered by Spotify" where appropriate
-
-2. **Data Usage**
-   - Only cache data needed for immediate use
-   - Don't use data for ML training
-   - Respect user privacy
-
-3. **Content Guidelines**
-   - Don't modify Spotify content
-   - Don't create derivative works from Spotify data
-   - Link back to Spotify for full playlist experience
+### Edge Case Testing
+- [ ] User with no playlists
+- [ ] Playlist with < 12 tracks
+- [ ] Playlist with 0 tracks
+- [ ] Very long playlist names
+- [ ] Token expiration during flow
+- [ ] Network errors during API calls
+- [ ] Rate limiting (429 responses)
+- [ ] User cancels authentication
 
 ---
 
-## Reference Documentation
+## References
 
-- **Spotify Web API**: https://developer.spotify.com/documentation/web-api
-- **OpenAPI Spec**: https://developer.spotify.com/reference/web-api/open-api-schema.yaml
-- **Authorization Code with PKCE**: https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
-- **Scopes**: https://developer.spotify.com/documentation/web-api/concepts/scopes
-- **Rate Limiting**: https://developer.spotify.com/documentation/web-api/concepts/rate-limits
-- **Developer Terms**: https://developer.spotify.com/terms
-
----
-
-## Sample Code Reference
-
-The `spotify-api-sample` folder contains a simple authentication project that demonstrates:
-- PKCE flow implementation
-- Token management
-- Basic API calls
-- Error handling patterns
-
-Review this sample code for implementation guidance, particularly for:
-- Generating code verifier and challenge
-- Building authorization URLs
-- Exchanging authorization codes for tokens
-- Making authenticated API requests
+- [Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api)
+- [Authorization Code with PKCE Flow](https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow)
+- [Spotify OpenAPI Specification](https://developer.spotify.com/reference/web-api/open-api-schema.yaml)
+- [Spotify Developer Terms](https://developer.spotify.com/terms)
+- [OAuth 2.0 PKCE RFC](https://datatracker.ietf.org/doc/html/rfc7636)
 
 ---
 
-## Timeline Estimate
+## Notes
 
-- **Phase 1-2** (Setup & State): 2-3 days
-- **Phase 3-4** (Components): 3-4 days
-- **Phase 5-6** (Flow & Tracks): 2-3 days
-- **Phase 7-8** (Database & Errors): 2-3 days
-- **Phase 9-10** (Testing & Docs): 2-3 days
-
-**Total Estimated Time**: 11-16 days
+- **Test Mode**: Authentication flow supports test mode flag for isolated testing
+- **Cookie Security**: Using HTTP-only cookies prevents XSS attacks
+- **Token Refresh**: Automatic refresh with 5-minute buffer before expiration
+- **Rate Limiting**: Implements exponential backoff for 429 responses
+- **Error Handling**: Comprehensive error messages for debugging
+- **Pagination**: Handles large playlist collections with automatic pagination
+- **Track Limit**: Exactly 12 tracks displayed on vinyl cover (first 12 from playlist)
+- **Name Truncation**: Playlist names truncated to 8 characters for vinyl label
 
 ---
 
-## Success Criteria
-
-✅ Users can authenticate with Spotify successfully
-✅ Users can view and select their playlists
-✅ Vinyl details are pre-filled with Spotify data
-✅ Real track names appear on vinyl cover (first 12 tracks)
-✅ "Open in Spotify" button works correctly
-✅ Token refresh works seamlessly
-✅ Error handling provides good user experience
-✅ Application complies with Spotify Developer Terms
-✅ All existing functionality remains intact
-✅ Mobile responsive design maintained
+*Last Updated: 2026-06-06*
+*Status: Phase 1 - Debugging cookie issue*
