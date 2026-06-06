@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function Step2Cover({ onBack, onNext }: Props) {
-  const { coverImagePreviewUrl, setCoverImage } = useVinylStore()
+  const { coverImagePreviewUrl, setCoverImage, tracks } = useVinylStore()
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -25,10 +25,10 @@ export default function Step2Cover({ onBack, onNext }: Props) {
 
       <div className="w-full flex justify-center">
         <div className="sm:hidden">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} size={280} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} tracks={tracks} size={280} />
         </div>
         <div className="hidden sm:block">
-          <VinylCover coverImageUrl={coverImagePreviewUrl} size={420} />
+          <VinylCover coverImageUrl={coverImagePreviewUrl} tracks={tracks} size={420} />
         </div>
       </div>
 

@@ -8,6 +8,10 @@ export async function saveVinyl(params: {
   playlistName: string
   coverImageFile: File | null
   stickers: StickerPlacement[]
+  tracks: string[]
+  spotifyPlaylistId?: string | null
+  spotifyPlaylistUrl?: string | null
+  spotifyUserId?: string | null
 }): Promise<string> {
   const id = crypto.randomUUID()
 
@@ -24,7 +28,11 @@ export async function saveVinyl(params: {
     playlistName: params.playlistName,
     coverImageUrl,
     stickers: params.stickers,
+    tracks: params.tracks,
     createdAt: new Date().toISOString(),
+    ...(params.spotifyPlaylistId ? { spotifyPlaylistId: params.spotifyPlaylistId } : {}),
+    ...(params.spotifyPlaylistUrl ? { spotifyPlaylistUrl: params.spotifyPlaylistUrl } : {}),
+    ...(params.spotifyUserId ? { spotifyUserId: params.spotifyUserId } : {}),
   }
 
   await setDoc(doc(collection(db, 'vinyls'), id), vinyl)

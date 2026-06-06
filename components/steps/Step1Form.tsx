@@ -1,4 +1,5 @@
 'use client'
+import { useEffect } from 'react'
 import { useVinylStore } from '@/lib/vinylStore'
 import VinylDisc from '@/components/vinyl/VinylDisc'
 
@@ -7,8 +8,25 @@ interface Props {
   onNext: () => void
 }
 
+const truncate8 = (s: string) => (s.length > 8 ? s.slice(0, 8) : s)
+
 export default function Step1Form({ onBack, onNext }: Props) {
-  const { name, playlistName, setName, setPlaylistName } = useVinylStore()
+  const {
+    name,
+    playlistName,
+    spotifyUser,
+    selectedPlaylist,
+    setName,
+    setPlaylistName,
+  } = useVinylStore()
+
+  // Pre-fill from Spotify on first visit. Only fills empty fields so user edits
+  // are never overwritten on remount.
+  useEffect(() => {
+    if (spotifyUser && !name) setName(spotifyUser.display_name)
+    if (selectedPlaylist && !playlistName) setPlaylistName(truncate8(selectedPlaylist.name))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="flex flex-col items-center w-full">

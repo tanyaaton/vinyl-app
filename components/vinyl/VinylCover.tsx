@@ -4,6 +4,7 @@ interface Props {
   coverImageUrl?: string | null
   stickers?: StickerPlacement[]
   name?: string
+  tracks?: string[]
   size?: number
 }
 
@@ -25,7 +26,7 @@ const CORNER_STYLES: Record<string, React.CSSProperties> = {
   'bottom-right': { bottom: 20, right: 60 },
 }
 
-export default function VinylCover({ coverImageUrl, stickers = [], name = '', size = 320 }: Props) {
+export default function VinylCover({ coverImageUrl, stickers = [], name = '', tracks = [], size = 320 }: Props) {
   return (
     <div
       className="relative shrink-0 overflow-hidden shadow-md"
@@ -93,24 +94,35 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', si
         )
       })}
 
-      {/* Name label at bottom-left, inside the cover with margin */}
-      {name && (
+      {/* Track list at bottom-left, inside the cover with margin */}
+      {tracks.length > 0 && (
         <div
           className="absolute"
           style={{
-            bottom: size * 0.072 + size * 0.03,  // Cover bottom inset + small margin
-            left: size * 0.087 + size * 0.03,    // Cover left inset + small margin
+            bottom: size * 0.05,  // More space from bottom to fit all tracks
+            left: size * 0.02 + size * 0.03,    // Align with cover left edge + margin
+            maxWidth: size * 0.825 - size * 0.06, // Stay within cover bounds with margin
+            maxHeight: size * 0.45,  // Increased height for all 12 tracks + labels
           }}
         >
-          <span
-            className="font-jacquarda text-gray-700"
+          <div
+            className="text-gray-700"
             style={{
-              fontSize: size * 0.04,
-              opacity: 0.6
+              fontFamily: 'Jacquarda, cursive',
+              fontSize: size * 0.0255,  // Smaller font to fit all tracks
+              opacity: 0.7,
+              lineHeight: '1.15'  // Tighter line height to fit all tracks
             }}
           >
-            by {name}
-          </span>
+            <div className="font-semibold" style={{ marginBottom: size * 0.005 }}>Side A</div>
+            {tracks.slice(0, 6).map((track, i) => (
+              <div key={`a-${i}`} className="truncate">{track || ' '}</div>
+            ))}
+            <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
+            {tracks.slice(6, 12).map((track, i) => (
+              <div key={`b-${i}`} className="truncate">{track || ' '}</div>
+            ))}
+          </div>
         </div>
       )}
     </div>
