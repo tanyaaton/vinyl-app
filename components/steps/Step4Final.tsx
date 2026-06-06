@@ -12,6 +12,7 @@ export default function Step4Final() {
   const store = useVinylStore()
   const [shareUrl, setShareUrl] = useState('')
   const [saveState, setSaveState] = useState<SaveState>('saving')
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const hasSaved = useRef(false)
 
@@ -47,6 +48,7 @@ export default function Step4Final() {
         setSaveState('done')
       } catch (e) {
         console.error('Save failed:', e)
+        setSaveError(e instanceof Error ? e.message : String(e))
         setSaveState('error')
       }
     }
@@ -107,10 +109,16 @@ export default function Step4Final() {
         )}
 
         {saveState === 'error' && (
-          <p className="font-courier text-xs text-amber-700 text-center max-w-sm">
-            ⚠ Could not save — Firebase is not configured yet. Fill in{' '}
-            <code>.env.local</code> with your Firebase keys to enable share links.
-          </p>
+          <div className="flex flex-col items-center gap-2 max-w-md">
+            <p className="font-jacquarda text-sm text-red-700 text-center">
+              Could not save your vinyl.
+            </p>
+            {saveError && (
+              <p className="font-courier text-xs text-amber-700 text-center break-all">
+                {saveError}
+              </p>
+            )}
+          </div>
         )}
 
         {saveState === 'done' && shareUrl && (

@@ -3,6 +3,24 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from './firebase'
 import type { VinylData, StickerPlacement } from './types'
 
+// Firestore rejects writes with any `undefined` value anywhere in the tree
+// ("Unsupported field value: undefined"). Recursively drop them so optional
+// fields on stickers / Spotify metadata never trip the writer.
+function stripUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map(stripUndefined) as unknown as T
+  }
+  if (value !== null && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      if (v === undefined) continue
+      out[k] = stripUndefined(v)
+    }
+    return out as T
+  }
+  return value
+}
+
 export async function saveVinyl(params: {
   name: string
   playlistName: string
@@ -35,7 +53,7 @@ export async function saveVinyl(params: {
     ...(params.spotifyUserId ? { spotifyUserId: params.spotifyUserId } : {}),
   }
 
-  await setDoc(doc(collection(db, 'vinyls'), id), vinyl)
+  await setDoc(doc(collection(db, 'vinyls'), id), stripUndefined(vinyl))
   return id
 }
 
