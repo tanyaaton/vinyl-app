@@ -136,17 +136,17 @@ export default function Step4Final({ onBack }: Props) {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base self-center"
+                className="btn-tape px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base self-center"
               >
                 ♫ open in spotify
               </a>
             )}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
-              <span className="font-jacquarda text-base sm:text-xl text-gray-600 sm:whitespace-nowrap">
-                Share this vinyl
-              </span>
-              <input readOnly value={shareUrl} className="vinyl-input flex-1 text-xs sm:text-sm" />
-              <button className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base" onClick={handleCopy}>
+            <span className="font-jacquarda text-base sm:text-xl text-gray-600">
+              Share this vinyl
+            </span>
+            <div className="flex flex-row items-center gap-2 w-full">
+              <input readOnly value={shareUrl} className="vinyl-input flex-1 min-w-0 text-xs sm:text-sm" />
+              <button className="btn-tape px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base shrink-0" onClick={handleCopy}>
                 {copied ? 'copied!' : 'copy'}
               </button>
             </div>
@@ -158,7 +158,7 @@ export default function Step4Final({ onBack }: Props) {
       <div className="flex gap-4 sm:gap-8 mt-8 sm:mt-12">
         {saveState !== 'saving' && (
           <button
-            className="btn-tape text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3"
+            className="btn-tape text-sm sm:text-lg px-4 sm:px-10 py-1.5 sm:py-3"
             onClick={onBack}
           >
             Back
@@ -167,7 +167,7 @@ export default function Step4Final({ onBack }: Props) {
 
         {(saveState === 'idle' || saveState === 'error') && (
           <button
-            className="btn-tape text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3"
+            className="btn-tape text-sm sm:text-lg px-4 sm:px-10 py-1.5 sm:py-3"
             onClick={handleGenerate}
           >
             {saveState === 'error' ? 'Retry' : 'Generate share link'}
