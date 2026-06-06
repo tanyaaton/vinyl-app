@@ -22,6 +22,13 @@ function stripUndefined<T>(value: T): T {
 }
 
 export async function saveVinyl(params: {
+  /**
+   * If provided, the vinyl is saved at this id (overwriting the existing doc
+   * and reusing the same cover-image storage path). Pass `store.vinylId` from
+   * a prior save so going back to edit and re-clicking "Generate share link"
+   * doesn't create a new document each time.
+   */
+  id?: string | null
   name: string
   playlistName: string
   coverImageFile: File | null
@@ -32,7 +39,7 @@ export async function saveVinyl(params: {
   spotifyPlaylistUrl?: string | null
   spotifyUserId?: string | null
 }): Promise<string> {
-  const id = crypto.randomUUID()
+  const id = params.id ?? crypto.randomUUID()
 
   let coverImageUrl: string | null = null
   if (params.coverImageFile) {

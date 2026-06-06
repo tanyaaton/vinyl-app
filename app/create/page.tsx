@@ -52,7 +52,7 @@ export default function CreatePage() {
               onNext={() => setStep(5)}
             />
           )}
-          {step === 5 && <Step4Final />}
+          {step === 5 && <Step4Final onBack={() => setStep(4)} />}
         </div>
       </main>
     </div>
