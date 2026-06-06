@@ -36,8 +36,8 @@ This document outlines the complete action plan for integrating Spotify API into
 
 ## Implementation Phases
 
-### Phase 1: Setup & Authentication ✅ (In Progress - Debugging)
-**Status**: Backend infrastructure complete, debugging cookie issue
+### Phase 1: Setup & Authentication ✅ (Complete)
+**Status**: Backend infrastructure complete, end-to-end auth verified on the test page (profile + playlists fetched successfully).
 
 #### Task 1: Setup Spotify Developer Account ✅
 - [x] Register application at https://developer.spotify.com/dashboard
@@ -65,9 +65,9 @@ This document outlines the complete action plan for integrating Spotify API into
 #### Task 4: Create API Service ✅
 - [x] Create `lib/spotify/api.ts`
 - [x] Implement API functions:
-  - `getUserProfile()` - Get user's Spotify profile
-  - `getAllUserPlaylists()` - Fetch all playlists with pagination
-  - `getVinylTrackList(playlistId)` - Get exactly 12 formatted tracks
+  - `getUserProfile()` - Get user's Spotify profile (`GET /me`)
+  - `getAllUserPlaylists()` - Fetch all playlists with pagination (`GET /me/playlists`)
+  - `getVinylTrackList(playlistId)` - Get exactly 12 formatted tracks (uses non-deprecated `GET /playlists/{id}/items`)
   - `formatTrackForVinyl(track)` - Format as "Artist - Track Name"
 - [x] Implement error handling with `SpotifyAPIError` class
 - [x] Add rate limiting support (429 handling with Retry-After)
@@ -106,16 +106,40 @@ This document outlines the complete action plan for integrating Spotify API into
 - [x] Handle missing token cases
 - [x] Add comprehensive logging for debugging
 
-#### Task 9: Test Authentication Flow ⏳ (In Progress)
+#### Task 9: Test Authentication Flow ✅
 - [x] Create test page at `/test-spotify`
 - [x] Test login flow with test mode
 - [x] Verify token storage in cookies
-- [ ] **DEBUG**: Fix cookie reading issue in token endpoint
-- [ ] Verify profile retrieval works
-- [ ] Verify playlist retrieval works
-- [ ] Test token refresh mechanism
+- [x] Fix cookie reading issue in token endpoint (see "Cookie Issue — Root Cause & Fix" below)
+- [x] Verify profile retrieval works
+- [x] Verify playlist retrieval works
+- [ ] Test token refresh mechanism (deferred — will exercise during longer sessions in Phase 9)
 
-**Current Issue**: Cookies are being set in callback but not readable in token endpoint. Added logging to debug.
+---
+
+#### Cookie Issue — Root Cause & Fix
+
+**Symptom**: After a successful Spotify OAuth exchange, the callback logged `Cookies set on response object`, but the very next request to `/api/auth/token` logged `All cookies: []` and returned 401. Profile and playlist fetches all failed.
+
+**Wrong initial hypothesis (now corrected)**: We assumed `response.cookies.set()` on a `NextResponse.redirect()` was failing to emit Set-Cookie headers. It wasn't — the headers were being sent, just to a different origin than the one the test page later made fetches from.
+
+**Actual root cause — `localhost` vs `127.0.0.1` origin mismatch**:
+- `next dev` binds to both `localhost:3000` and `127.0.0.1:3000` by default.
+- Per Spotify policy (and `spotify-api-guideline.md`), the redirect URI in `.env.local` must be `http://127.0.0.1:3000/...` — `http://localhost` is not allowed.
+- The user opened the test page on `http://localhost:3000/test-spotify`, but the OAuth callback fired on `http://127.0.0.1:3000/api/auth/callback` and set cookies on the `127.0.0.1` origin.
+- Browsers treat `localhost` and `127.0.0.1` as **different origins** even though they resolve to the same IP. Once the user's tab landed back on `localhost`, the cookies stored against `127.0.0.1` were invisible — hence the empty cookie jar on `/api/auth/token`.
+
+**Fix — applied changes**:
+1. `package.json` → `"dev": "next dev -H 127.0.0.1"`. The dev server only binds the canonical origin Spotify redirects to, eliminating the `localhost`/`127.0.0.1` split for new sessions.
+2. `lib/spotify/auth.ts` → added `ensureMatchingOrigin()` helper. Before initiating OAuth (and on `/test-spotify` mount), the client compares `window.location.origin` to the origin of `NEXT_PUBLIC_REDIRECT_URI` and `window.location.replace()`s to the matching origin if they differ. This makes the app self-correcting if a user lands on the wrong host.
+3. `app/api/auth/callback/route.ts` → rewritten to:
+   - use `request.nextUrl.origin` to build absolute redirect URLs (no chance of relative-URL ambiguity);
+   - attach each cookie via `response.headers.append('Set-Cookie', …)` instead of `response.cookies.set()`, which sidesteps any quirks with cookie attachment on 307 redirect responses;
+   - keep `HttpOnly`, `Path=/`, `SameSite=Lax`, `Max-Age=<expires_in>`, and `Secure` only in production.
+4. `app/api/auth/token/route.ts` → read cookies from `request.cookies` (matches the working refresh route pattern), mark the route `export const dynamic = 'force-dynamic'`, and return `Cache-Control: no-store` so dev caching can't serve a stale 401.
+5. `lib/spotify/auth.ts` → both client fetches to `/api/auth/token` and `/api/auth/refresh` now use `cache: 'no-store'`.
+
+**Verification**: After restarting the dev server and opening `http://127.0.0.1:3000/test-spotify`, the OAuth flow completes, `Incoming cookies:` lists all three Spotify cookies, and the profile + playlists render correctly.
 
 ---
 
@@ -344,7 +368,7 @@ This document outlines the complete action plan for integrating Spotify API into
 2. **Token Exchange**: `https://accounts.spotify.com/api/token`
 3. **User Profile**: `GET https://api.spotify.com/v1/me`
 4. **User Playlists**: `GET https://api.spotify.com/v1/me/playlists`
-5. **Playlist Tracks**: `GET https://api.spotify.com/v1/playlists/{id}/tracks`
+5. **Playlist Items**: `GET https://api.spotify.com/v1/playlists/{id}/items` (use `/items`, not the deprecated `/tracks`)
 
 ### Required Scopes
 - `user-read-private` - Access user profile
@@ -419,22 +443,19 @@ components/
 - Spotify Developer account setup
 - Environment configuration
 - Authentication module with PKCE flow
-- API service with error handling
+- API service with error handling (uses non-deprecated `/playlists/{id}/items`)
 - Type definitions
-- OAuth callback route with cookie storage
+- OAuth callback route with cookie storage (Set-Cookie headers attached explicitly)
 - Token refresh route
-- Token retrieval route
-- Test page for authentication
-
-### ⏳ In Progress
-- **Debugging cookie issue**: Tokens are being set in callback but not readable in token endpoint
-- Added comprehensive logging to identify the issue
+- Token retrieval route (reads from `request.cookies`, `force-dynamic`, `no-store`)
+- Origin guard (`ensureMatchingOrigin`) that auto-redirects `localhost` → `127.0.0.1`
+- Dev server pinned to `127.0.0.1` via `next dev -H 127.0.0.1`
+- Test page for authentication — end-to-end verified (login → profile → playlists)
 
 ### ⏳ Next Steps
-1. Fix cookie reading issue in token endpoint
-2. Complete authentication flow testing
-3. Begin Phase 2: State Management
-4. Create UI components for Spotify steps
+1. Begin Phase 2: State Management (Zustand store updates)
+2. Create UI components for Spotify auth and playlist selection (Phase 3)
+3. Exercise token refresh during long sessions (Task 9 deferred item)
 
 ---
 
@@ -445,11 +466,11 @@ components/
 - [x] User can approve access
 - [x] Callback receives authorization code
 - [x] Tokens are exchanged successfully
-- [x] Tokens stored in HTTP-only cookies
-- [ ] **DEBUG**: Token endpoint can read cookies
-- [ ] Profile data can be fetched
-- [ ] Playlists can be fetched
-- [ ] Token refresh works automatically
+- [x] Tokens stored in HTTP-only cookies (on the `127.0.0.1` origin)
+- [x] Token endpoint can read cookies
+- [x] Profile data can be fetched
+- [x] Playlists can be fetched
+- [ ] Token refresh works automatically (deferred — needs a long session to verify)
 - [ ] Logout clears all tokens
 
 ### Integration Testing
@@ -497,4 +518,4 @@ components/
 ---
 
 *Last Updated: 2026-06-06*
-*Status: Phase 1 - Debugging cookie issue*
+*Status: Phase 1 complete — auth flow verified end-to-end. Ready to start Phase 2.*
