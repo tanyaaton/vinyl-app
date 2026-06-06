@@ -6,13 +6,14 @@
 import { useState } from 'react'
 import VinylDisc from './VinylDisc'
 import VinylCover from './VinylCover'
-import type { StickerPlacement, CoverImageLayout } from '@/lib/types'
+import type { StickerPlacement, CoverImageLayout, VinylColor } from '@/lib/types'
 
 interface Props {
   name: string
   playlistName: string
   coverImageUrl?: string | null
   coverImageLayout?: CoverImageLayout
+  vinylColor?: VinylColor
   stickers?: StickerPlacement[]
   tracks?: string[]
   coverSize?: number
@@ -24,6 +25,7 @@ export default function VinylPreview({
   playlistName,
   coverImageUrl,
   coverImageLayout = 'full',
+  vinylColor = 'default',
   stickers = [],
   tracks = [],
   coverSize = 300,
@@ -63,7 +65,7 @@ export default function VinylPreview({
         style={{ left: coverSize + discLeftOffset - discOverlap, top: 0, zIndex: discZIndex }}
         onClick={interactive ? () => setTopElement('disc') : undefined}
       >
-        <VinylDisc name={name} playlistName={playlistName} size={discSize} />
+        <VinylDisc name={name} playlistName={playlistName} size={discSize} vinylColor={vinylColor} />
       </div>
     </div>
   )

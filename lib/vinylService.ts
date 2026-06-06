@@ -1,7 +1,7 @@
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from './firebase'
-import type { VinylData, StickerPlacement, CoverImageLayout } from './types'
+import type { VinylData, StickerPlacement, CoverImageLayout, VinylColor } from './types'
 
 // Firestore rejects writes with any `undefined` value anywhere in the tree
 // ("Unsupported field value: undefined"). Recursively drop them so optional
@@ -33,6 +33,7 @@ export async function saveVinyl(params: {
   playlistName: string
   coverImageFile: File | null
   coverImageLayout?: CoverImageLayout
+  vinylColor?: VinylColor
   stickers: StickerPlacement[]
   tracks: string[]
   spotifyPlaylistId?: string | null
@@ -57,6 +58,7 @@ export async function saveVinyl(params: {
     tracks: params.tracks,
     createdAt: new Date().toISOString(),
     ...(params.coverImageLayout ? { coverImageLayout: params.coverImageLayout } : {}),
+    ...(params.vinylColor ? { vinylColor: params.vinylColor } : {}),
     ...(params.spotifyPlaylistId ? { spotifyPlaylistId: params.spotifyPlaylistId } : {}),
     ...(params.spotifyPlaylistUrl ? { spotifyPlaylistUrl: params.spotifyPlaylistUrl } : {}),
     ...(params.spotifyUserId ? { spotifyUserId: params.spotifyUserId } : {}),
