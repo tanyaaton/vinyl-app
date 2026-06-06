@@ -4,7 +4,7 @@
  * Reference: https://developer.spotify.com/documentation/web-api
  */
 
-import { getValidAccessToken } from './auth';
+import { AuthRequiredError, getValidAccessToken } from './auth';
 
 const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
 
@@ -148,7 +148,10 @@ async function retryWithBackoff<T>(
     } catch (error) {
       lastError = error as Error;
 
-      // Don't retry on authentication errors
+      // Don't retry on authentication errors — no token, or rejected token.
+      if (error instanceof AuthRequiredError) {
+        throw error;
+      }
       if (error instanceof SpotifyAPIError && error.status === 401) {
         throw error;
       }

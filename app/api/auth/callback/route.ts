@@ -77,7 +77,9 @@ export async function GET(request: NextRequest) {
     );
 
     const expiresAt = Date.now() + tokens.expires_in * 1000;
-    const redirectPath = testMode ? '/test-spotify?auth=success' : '/create?step=3';
+    const redirectPath = testMode
+      ? '/test-spotify?auth=success'
+      : '/create?step=1&auth=success';
     const response = NextResponse.redirect(new URL(redirectPath, origin));
 
     // Build Set-Cookie headers explicitly so they are always attached to the redirect response.

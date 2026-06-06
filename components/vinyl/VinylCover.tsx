@@ -116,11 +116,11 @@ export default function VinylCover({ coverImageUrl, stickers = [], name = '', tr
           >
             <div className="font-semibold" style={{ marginBottom: size * 0.005 }}>Side A</div>
             {tracks.slice(0, 6).map((track, i) => (
-              <div key={`a-${i}`} className="truncate">{track}</div>
+              <div key={`a-${i}`} className="truncate">{track || ' '}</div>
             ))}
             <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
             {tracks.slice(6, 12).map((track, i) => (
-              <div key={`b-${i}`} className="truncate">{track}</div>
+              <div key={`b-${i}`} className="truncate">{track || ' '}</div>
             ))}
           </div>
         </div>

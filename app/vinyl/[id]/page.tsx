@@ -63,9 +63,20 @@ export default async function SharePage({ params }: Props) {
           {vinyl.playlistName} · by {vinyl.name}
         </p>
 
+        {vinyl.spotifyPlaylistUrl && (
+          <a
+            href={vinyl.spotifyPlaylistUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-tape text-sm sm:text-base px-8 sm:px-10 py-2 sm:py-3 mt-6 sm:mt-8 inline-block"
+          >
+            ♫ open in spotify
+          </a>
+        )}
+
         <a
           href="/"
-          className="btn-tape text-sm sm:text-base px-8 sm:px-10 py-2 sm:py-3 mt-6 sm:mt-8 inline-block"
+          className="btn-tape text-sm sm:text-base px-8 sm:px-10 py-2 sm:py-3 mt-4 sm:mt-6 inline-block"
         >
           Create yours
         </a>

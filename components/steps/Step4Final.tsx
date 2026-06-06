@@ -32,6 +32,13 @@ export default function Step4Final() {
             coverImageFile: store.coverImageFile,
             stickers: store.stickers,
             tracks: store.tracks,
+            spotifyPlaylistId: store.selectedPlaylist?.id ?? null,
+            spotifyPlaylistUrl:
+              store.selectedPlaylist?.external_urls?.spotify ??
+              (store.selectedPlaylist
+                ? `https://open.spotify.com/playlist/${store.selectedPlaylist.id}`
+                : null),
+            spotifyUserId: store.spotifyUser?.id ?? null,
           }),
           timeout,
         ])
@@ -107,14 +114,29 @@ export default function Step4Final() {
         )}
 
         {saveState === 'done' && shareUrl && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
-            <span className="font-jacquarda text-base sm:text-xl text-gray-600 sm:whitespace-nowrap">
-              Share this vinyl
-            </span>
-            <input readOnly value={shareUrl} className="vinyl-input flex-1 text-xs sm:text-sm" />
-            <button className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base" onClick={handleCopy}>
-              {copied ? 'copied!' : 'copy'}
-            </button>
+          <div className="flex flex-col items-stretch gap-3 w-full">
+            {store.selectedPlaylist && (
+              <a
+                href={
+                  store.selectedPlaylist.external_urls?.spotify ??
+                  `https://open.spotify.com/playlist/${store.selectedPlaylist.id}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base self-center"
+              >
+                ♫ open in spotify
+              </a>
+            )}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
+              <span className="font-jacquarda text-base sm:text-xl text-gray-600 sm:whitespace-nowrap">
+                Share this vinyl
+              </span>
+              <input readOnly value={shareUrl} className="vinyl-input flex-1 text-xs sm:text-sm" />
+              <button className="btn-tape px-4 sm:px-5 py-2 text-sm sm:text-base" onClick={handleCopy}>
+                {copied ? 'copied!' : 'copy'}
+              </button>
+            </div>
           </div>
         )}
       </div>

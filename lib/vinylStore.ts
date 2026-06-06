@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StickerPlacement, StickerId, StickerCorner } from './types'
+import type { StickerPlacement, StickerId, StickerCorner, SpotifyUser, SpotifyPlaylist } from './types'
 
 const CORNER_ORDER: StickerCorner[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 
@@ -13,12 +13,18 @@ interface VinylStore {
   stickers: StickerPlacement[]
   tracks: string[]
   vinylId: string | null
+  spotifyUser: SpotifyUser | null
+  selectedPlaylist: SpotifyPlaylist | null
 
   setName: (name: string) => void
   setPlaylistName: (name: string) => void
   setCoverImage: (file: File) => void
   toggleSticker: (id: StickerId) => void
   setVinylId: (id: string) => void
+  setTracks: (tracks: string[]) => void
+  setSpotifyUser: (user: SpotifyUser | null) => void
+  setSelectedPlaylist: (playlist: SpotifyPlaylist | null) => void
+  clearSpotifyData: () => Promise<void>
   reset: () => void
 }
 
@@ -30,6 +36,8 @@ const initialState = {
   stickers: [] as StickerPlacement[],
   tracks: ['song1', 'song2', 'song3', 'song4', 'song5', 'song6', 'song7', 'song8', 'song9', 'song10', 'song11', 'song12'],
   vinylId: null,
+  spotifyUser: null as SpotifyUser | null,
+  selectedPlaylist: null as SpotifyPlaylist | null,
 }
 
 // Ensure tracks array always has 12 items
@@ -79,6 +87,21 @@ export const useVinylStore = create<VinylStore>()(
 
       setVinylId: (id) => set({ vinylId: id }),
 
+      setTracks: (tracks) => set({ tracks: ensureTracksLength(tracks) }),
+
+      setSpotifyUser: (spotifyUser) => set({ spotifyUser }),
+
+      setSelectedPlaylist: (selectedPlaylist) => set({ selectedPlaylist }),
+
+      clearSpotifyData: async () => {
+        set({ spotifyUser: null, selectedPlaylist: null })
+        try {
+          await fetch('/api/auth/logout', { method: 'POST', cache: 'no-store' })
+        } catch {
+          // Network failure leaves the cookies in place; they'll expire on their own.
+        }
+      },
+
       reset: () => {
         const prev = get().coverImagePreviewUrl
         if (prev) URL.revokeObjectURL(prev)
@@ -115,6 +138,8 @@ export const useVinylStore = create<VinylStore>()(
           stickers: state.stickers,
           tracks: ensureTracksLength(state.tracks),
           vinylId: state.vinylId,
+          spotifyUser: state.spotifyUser,
+          selectedPlaylist: state.selectedPlaylist,
         }) as unknown as VinylStore,
     }
   )

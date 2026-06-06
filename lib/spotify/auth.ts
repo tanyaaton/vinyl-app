@@ -7,6 +7,18 @@
 const SPOTIFY_AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
 const SPOTIFY_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 
+/**
+ * Thrown when no valid Spotify session exists (no access cookie, or refresh
+ * failed). Callers should treat this as "user must log in" rather than
+ * retrying — it isn't a transient network failure.
+ */
+export class AuthRequiredError extends Error {
+  constructor(message: string = 'Spotify authentication required') {
+    super(message);
+    this.name = 'AuthRequiredError';
+  }
+}
+
 // Required scopes for the application
 const SCOPES = [
   'user-read-private',
@@ -250,74 +262,6 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
 }
 
 /**
- * Store Spotify tokens in sessionStorage
- * @param accessToken - Access token
- * @param refreshToken - Refresh token
- * @param expiresIn - Token expiration time in seconds
- */
-export function storeTokens(
-  accessToken: string,
-  refreshToken: string,
-  expiresIn: number
-): void {
-  if (typeof window !== 'undefined') {
-    const expiresAt = Date.now() + expiresIn * 1000;
-    sessionStorage.setItem('spotify_access_token', accessToken);
-    sessionStorage.setItem('spotify_refresh_token', refreshToken);
-    sessionStorage.setItem('spotify_token_expires_at', expiresAt.toString());
-  }
-}
-
-/**
- * Retrieve stored access token
- * @returns Access token or null
- */
-export function getAccessToken(): string | null {
-  if (typeof window !== 'undefined') {
-    return sessionStorage.getItem('spotify_access_token');
-  }
-  return null;
-}
-
-/**
- * Retrieve stored refresh token
- * @returns Refresh token or null
- */
-export function getRefreshToken(): string | null {
-  if (typeof window !== 'undefined') {
-    return sessionStorage.getItem('spotify_refresh_token');
-  }
-  return null;
-}
-
-/**
- * Check if access token is expired or about to expire
- * @returns True if token needs refresh
- */
-export function isTokenExpired(): boolean {
-  if (typeof window !== 'undefined') {
-    const expiresAt = sessionStorage.getItem('spotify_token_expires_at');
-    if (!expiresAt) return true;
-    
-    // Consider token expired if it expires in less than 5 minutes
-    const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    return Date.now() + bufferTime >= parseInt(expiresAt);
-  }
-  return true;
-}
-
-/**
- * Clear all stored Spotify tokens
- */
-export function clearTokens(): void {
-  if (typeof window !== 'undefined') {
-    sessionStorage.removeItem('spotify_access_token');
-    sessionStorage.removeItem('spotify_refresh_token');
-    sessionStorage.removeItem('spotify_token_expires_at');
-  }
-}
-
-/**
  * Get valid access token from HTTP-only cookies via API route
  * @returns Valid access token
  * @throws Error if unable to get valid token
@@ -332,18 +276,18 @@ export async function getValidAccessToken(): Promise<string> {
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('No authentication tokens found. Please log in again.');
+        throw new AuthRequiredError('No Spotify session — please log in.');
       }
       throw new Error('Failed to retrieve access token');
     }
 
     const data = await response.json();
-    
+
     // Check if token is expired or about to expire
     if (data.expires_at) {
       const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
       const isExpired = Date.now() + bufferTime >= data.expires_at;
-      
+
       if (isExpired && data.refresh_token) {
         // Token expired, refresh it via API route
         const refreshResponse = await fetch('/api/auth/refresh', {
@@ -351,21 +295,20 @@ export async function getValidAccessToken(): Promise<string> {
           credentials: 'include',
           cache: 'no-store',
         });
-        
+
         if (!refreshResponse.ok) {
-          throw new Error('Session expired. Please log in again.');
+          throw new AuthRequiredError('Spotify session expired — please log in.');
         }
-        
+
         const refreshData = await refreshResponse.json();
         return refreshData.access_token;
       }
     }
-    
+
     return data.access_token;
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
+    if (error instanceof AuthRequiredError) throw error;
+    if (error instanceof Error) throw error;
     throw new Error('Failed to get valid access token');
   }
 }
