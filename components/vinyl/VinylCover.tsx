@@ -46,6 +46,14 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
           height: size,
         }
 
+  // Filter out the empty/padded slots getVinylTrackList emits so the rendered
+  // tracklist is consecutive (no large gaps from blank lines). Side A gets the
+  // ceiling half so an odd count puts the extra song on Side A.
+  const realTracks = tracks.filter((t) => t && t.trim() !== '')
+  const sideACount = Math.ceil(realTracks.length / 2)
+  const sideA = realTracks.slice(0, sideACount)
+  const sideB = realTracks.slice(sideACount)
+
   return (
     <div
       className="relative shrink-0 overflow-hidden shadow-md"
@@ -85,7 +93,7 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
               ...CORNER_STYLES[corner],
               transform: `rotate(${rotation || 0}deg)`,
             }
-        
+
         return (
           <div
             key={stickerId}
@@ -105,34 +113,42 @@ export default function VinylCover({ coverImageUrl, coverImageLayout = 'full', s
         )
       })}
 
-      {/* Track list at bottom-left, inside the cover with margin */}
-      {tracks.length > 0 && (
+      {/*
+        Track list at bottom-left. Anchored to `bottom` so the last rendered
+        line always sits at the same bottom margin regardless of how many
+        tracks there are.
+      */}
+      {realTracks.length > 0 && (
         <div
           className="absolute"
           style={{
-            bottom: size * 0.05,  // More space from bottom to fit all tracks
-            left: size * 0.02 + size * 0.03,    // Align with cover left edge + margin
-            maxWidth: size * 0.825 - size * 0.06, // Stay within cover bounds with margin
-            maxHeight: size * 0.45,  // Increased height for all 12 tracks + labels
+            bottom: size * 0.05,
+            left: size * 0.05,
+            maxWidth: size * 0.825 - size * 0.06,
+            maxHeight: size * 0.45,
           }}
         >
           <div
             className="text-gray-700"
             style={{
               fontFamily: 'Jacquarda, cursive',
-              fontSize: size * 0.0255,  // Smaller font to fit all tracks
+              fontSize: size * 0.0255,
               opacity: 0.7,
-              lineHeight: '1.15'  // Tighter line height to fit all tracks
+              lineHeight: '1.15',
             }}
           >
             <div className="font-semibold" style={{ marginBottom: size * 0.005 }}>Side A</div>
-            {tracks.slice(0, 6).map((track, i) => (
-              <div key={`a-${i}`} className="truncate">{track || ' '}</div>
+            {sideA.map((track, i) => (
+              <div key={`a-${i}`} className="truncate">{track}</div>
             ))}
-            <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
-            {tracks.slice(6, 12).map((track, i) => (
-              <div key={`b-${i}`} className="truncate">{track || ' '}</div>
-            ))}
+            {sideB.length > 0 && (
+              <>
+                <div className="font-semibold" style={{ marginTop: size * 0.01, marginBottom: size * 0.005 }}>Side B</div>
+                {sideB.map((track, i) => (
+                  <div key={`b-${i}`} className="truncate">{track}</div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       )}
