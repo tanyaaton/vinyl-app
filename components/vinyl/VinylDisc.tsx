@@ -49,10 +49,10 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
           {/* Center text: "Vinylio" */}
           <text
             x={cx}
-            y={cy - labelSize * 0.076}
+            y={cy - labelSize * 0.09}
             textAnchor="middle"
             fontFamily="'MrsSheppards', cursive"
-            fontSize={labelSize * 0.335}
+            fontSize={labelSize * 0.31}
             fill="#7B1818"
           >
             Vinylio

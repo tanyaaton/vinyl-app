@@ -24,10 +24,10 @@ export default function LandingPage() {
 
         <div className="relative z-10">
           <div className="sm:hidden">
-            <VinylDisc size={300} landing />
+            <VinylDisc size={380} landing />
           </div>
           <div className="hidden sm:block">
-            <VinylDisc size={520} landing />
+            <VinylDisc size={650} landing />
           </div>
         </div>
 
