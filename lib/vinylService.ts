@@ -1,7 +1,7 @@
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { db, storage } from './firebase'
+import { db } from './firebase'
 import type { VinylData, StickerPlacement, CoverImageLayout, VinylColor, TrackTextColor } from './types'
+import { compressImageToBase64 } from './imageUtils'
 
 // Firestore rejects writes with any `undefined` value anywhere in the tree
 // ("Unsupported field value: undefined"). Recursively drop them so optional
@@ -45,9 +45,8 @@ export async function saveVinyl(params: {
 
   let coverImageUrl: string | null = null
   if (params.coverImageFile) {
-    const storageRef = ref(storage, `covers/${id}`)
-    await uploadBytes(storageRef, params.coverImageFile)
-    coverImageUrl = await getDownloadURL(storageRef)
+    // Compress image and convert to base64
+    coverImageUrl = await compressImageToBase64(params.coverImageFile)
   }
 
   const vinyl: VinylData = {
