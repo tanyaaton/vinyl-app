@@ -1,3 +1,4 @@
+'use client'
 import type { VinylColor } from '@/lib/types'
 
 /**
@@ -38,6 +39,15 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
           alt="Vinyl record"
           className="w-full h-full"
           draggable={false}
+        />
+        
+        {/* Spinning vinyl groove overlay */}
+        <img
+          src="/vinyl-groove.png"
+          alt="Vinyl groove"
+          className="absolute inset-0 w-full h-full animate-spin-slow"
+          draggable={false}
+          style={{ animationDuration: '3s' }}
         />
         
         <svg
@@ -132,6 +142,15 @@ export default function VinylDisc({ name = '', playlistName = '', size = 448, la
         alt="Vinyl record"
         className="w-full h-full"
         draggable={false}
+      />
+
+      {/* Spinning vinyl groove overlay */}
+      <img
+        src="/vinyl-groove.png"
+        alt="Vinyl groove"
+        className="absolute inset-0 w-full h-full animate-spin-slow"
+        draggable={false}
+        style={{ animationDuration: '3s' }}
       />
 
       <svg
