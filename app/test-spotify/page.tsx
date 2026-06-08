@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { initiateSpotifyAuth, getValidAccessToken, ensureMatchingOrigin } from '@/lib/spotify/auth';
 import { getUserProfile, getAllUserPlaylists } from '@/lib/spotify/api';
 import type { SpotifyUser, SpotifyPlaylist } from '@/lib/types';
 
-export default function TestSpotifyPage() {
+function TestSpotifyPageContent() {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<SpotifyUser | null>(null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
@@ -244,6 +244,14 @@ export default function TestSpotifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TestSpotifyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TestSpotifyPageContent />
+    </Suspense>
   );
 }
 
