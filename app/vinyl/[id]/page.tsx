@@ -30,9 +30,13 @@ export default async function SharePage({ params }: Props) {
     <div className="flex flex-col min-h-screen paper-texture">
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center py-8 sm:py-12 px-4">
-        <h2 className="font-jacquarda text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 tracking-wider">
+        <h2 className="font-jacquarda text-xl sm:text-2xl text-gray-600 mb-2 tracking-wider">
           {vinyl.name}'s vinyl
         </h2>
+        <p className="text-sm sm:text-base mb-6 sm:mb-8">
+          <span className="font-jacquarda text-gray-600">made by </span>
+          <span className="font-sheppards text-lg sm:text-2xl text-crimson">Vinylio</span>
+        </p>
 
         <div className="w-full flex justify-center overflow-visible">
           <div className="sm:hidden">
@@ -64,10 +68,6 @@ export default async function SharePage({ params }: Props) {
             />
           </div>
         </div>
-
-        <p className="font-sheppards text-gray-500 text-xl sm:text-2xl mt-6 sm:mt-10 text-center px-4">
-          {vinyl.playlistName} · by {vinyl.name}
-        </p>
 
         {vinyl.spotifyPlaylistUrl && (
           <a
