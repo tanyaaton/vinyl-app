@@ -34,3 +34,5 @@ launch.json
 .DS_Store
 
 spotify-api/
+
+DEPLOYMENT_PLAN.md
