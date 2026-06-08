@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/ui/Header'
 import StepIndicator from '@/components/ui/StepIndicator'
@@ -9,7 +9,7 @@ import Step2Cover from '@/components/steps/Step2Cover'
 import Step3Stickers from '@/components/steps/Step3Stickers'
 import Step4Final from '@/components/steps/Step4Final'
 
-export default function CreatePage() {
+function CreatePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
@@ -56,5 +56,13 @@ export default function CreatePage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatePageContent />
+    </Suspense>
   )
 }

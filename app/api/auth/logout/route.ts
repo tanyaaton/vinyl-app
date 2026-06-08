@@ -13,7 +13,7 @@ function expiredCookie(name: string): string {
   return attrs.join('; ');
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   const response = NextResponse.json(
     { ok: true },
     { headers: { 'Cache-Control': 'no-store' } }
